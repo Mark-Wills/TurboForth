@@ -1,0 +1,2 @@
+#! /bin/sh
+python ~/TI/xdt99/xas99.py -r -R build.asm --quiet-unused-syms -L listing.lst -S -o tf.obj
