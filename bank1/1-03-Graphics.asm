@@ -8,7 +8,7 @@
 ;                  |_|                                                      
 ; graphics related commands
 
-;[ GMODE ( gmode -- )
+; GMODE ( gmode -- )
 _gmode  mov *stack+,r8              ; pop gmode
         ci r8,0                     ; 40 column mode?
         jeq s40col                  ; jump if yes
@@ -77,16 +77,16 @@ col80d    ; register count and data
         byte 15,>04,>70,>03,>e8,>01,>06,>00,>f4,>88,>00,>00,>00,>94,>10,>00
         byte 80 ; XMAX
         even
-;]
 
-;[ HCHAR ( y x ascii count -- )
+
+; HCHAR ( y x ascii count -- )
 _hchar  bl @get4                    ; get parameters from stack and calculate 
                                     ; screen address
         bl @_vsbwm                  ; write to screen
 gexit   b @retB0
-;]
+
     
-;[ VCHAR ( y x ascii count -- )
+; VCHAR ( y x ascii count -- )
 _vchar  bl @get4                    ; get parameters from stack and calculate 
                                     ; screen address
         li r6,24                    ; row count
@@ -101,9 +101,9 @@ vchar1  bl @_vsbw                   ; write a character
 vchar2  dec r2                      ; decrement count
         jne vchar1                  ; repeat if not finished
         jmp gexit
-;]
 
-;[ GCHAR ( y x -- ascii )
+
+; GCHAR ( y x -- ascii )
 _gchar  bl @get2                    ; get y & x from stack
         mpy @xmax,r6                ; compute y
         a r7,r0                     ; compute screen address
@@ -113,9 +113,9 @@ _gchar  bl @get2                    ; get y & x from stack
         dect stack                  ; make space on stack
         mov r1,*stack               ; place on stack as 16 bit word
         jmp gexit
-;]
 
-;[ DCHAR ( address count ascii -- )
+
+; DCHAR ( address count ascii -- )
 ; Equivalent to CALL CHAR in BASIC.
 ; Used to define a character.
 ; Moves count words from address to ascii address in VDP memory
@@ -130,9 +130,9 @@ _dchar  bl @sget3                   ; get 3 parameters
         sla r2,1                    ; convert from words to bytes
         bl @_vmbw                   ; write to vdp
         jmp gexit
-;]
 
-;[ SPRITE ( sprite y x ascii color -- )
+
+; SPRITE ( sprite y x ascii color -- )
 ; sprite attribute list begins at 6*80h=300h
 _sprit  bl @sget5                   ; get 5 parameters
         dec r9                      ; correct for screen to char alignment
@@ -155,9 +155,9 @@ _sprit  bl @sget5                   ; get 5 parameters
         bl @_vmbw                   ; copy entry from SAL to appropriate sprite
                                     ; address in VDP 
 sprtx   b @retB0
-;]
 
-;[ COINC ( tolerance spr1 spr2 -- flag )
+
+; COINC ( tolerance spr1 spr2 -- flag )
 ; check for coincidence between sprite spr1 and spr2. If both the horizontal
 ; and vertical difference between the two sprites is < tolerance then the 
 ; sprites are considered to be in coincidence with each other and flag shall be
@@ -198,9 +198,9 @@ chkcnc  movb *r1+,r8                ; get spr1 coordinate
 miss    clr *stack
 coincx  jmp sprtx                   ; exit
         
-;]
 
-;[ MAGNIFY ( x -- )
+
+; MAGNIFY ( x -- )
 ; sets sprite magnification:
 ; only the least significant bits are used:
 ; bit 7: 1=magnified (0=not magnified)
@@ -220,9 +220,9 @@ _magfy  mov *stack+,r10             ; pop x
         swpb r0                     ; rotate
         bl @_vwtr                   ; set the register
         jmp sprtx
-;]
 
-;[ SPRCOL ( sprite# colour -- )
+
+; SPRCOL ( sprite# colour -- )
 ; sets the colour of a sprite
 _spcol  mov *stack+,r9              ; pop colour
         mov *stack+,r10             ; pop sprite#
@@ -236,9 +236,9 @@ _spcol  mov *stack+,r9              ; pop colour
         movb r9,*r8                 ; load into CPU SAL
         bl @_vsbw                   ; write colour byte into VDP
         jmp sprtx
-;]
 
-;[ SPRLOC ( sprite y x -- )
+
+; SPRLOC ( sprite y x -- )
 ; sets the location of a sprite
 _sploc  bl @sget3                   ; get 3 parameters from stack
         dec r9                      ; correct for screen to char alignment
@@ -255,9 +255,9 @@ _sploc  bl @sget3                   ; get 3 parameters from stack
         li r2,2                     ; two bytes to write
         bl @_vmbw                   ; write to VDP
         jmp sprtx
-;]
 
-;[ SPRLOC? ( sprite -- y x )
+
+; SPRLOC? ( sprite -- y x )
 ; gets the location of a sprite
 _spget  mov *stack,r10              ; pop sprite#
         li r0,sal                   ; address of SAL in CPU ram
@@ -274,9 +274,9 @@ _spget  mov *stack,r10              ; pop sprite#
         swpb r1                     ; move to lsb
         mov r1,*stack               ; place on stack
         jmp sprtx
-;]
 
-;[ SPRPAT ( sprite# ascii -- )
+
+; SPRPAT ( sprite# ascii -- )
 ; sets the pattern of a sprite
 _sppat  mov *stack+,r9              ; pop ascii
         mov *stack+,r10             ; pop sprite#
@@ -290,9 +290,9 @@ _sppat  mov *stack+,r9              ; pop ascii
         movb r9,*r2                 ; set in cpu ram
         bl @_vsbw                   ; set in vdp ram
         jmp sprtx
-;]
 
-;[ SPRVEC ( sprite y x -- )
+
+; SPRVEC ( sprite y x -- )
 ; sets the Y and X movement offsets for sprite movement with SPRMOV
 _smlst  bl @sget3                   ; get 3 parameters
         li r0,smlist                ; address of sprite movement list
@@ -304,9 +304,9 @@ _smlst  bl @sget3                   ; get 3 parameters
         movb r9,*r0+                ; load y into smlist
         movb r8,*r0                 ; load x into smlist
         jmp gexit1
-;]
 
-;[ SPRMOV ( start_sprite number_of_sprites -- )
+
+; SPRMOV ( start_sprite number_of_sprites -- )
 ; moves sprites according to the entries in SMLIST, starting from start_sprite
 ; and continuing for number_of_sprites
 ;
@@ -336,9 +336,9 @@ sprmv1  ab *r10+,*r11+              ; add y
         sla r2,2                    ; calculate number of bytes to write
         bl @_vmbw                   ; copy cpu sal to vdp sal
         jmp gexit1
-;]
 
-;[ COLOR ( char_set foreground background -- )
+
+; COLOR ( char_set foreground background -- )
 ; sets the color sets in 32 column mode
 _color  bl @sget3                   ; get 3 parameters
         li r0,>380                  ; address of colour table
@@ -349,9 +349,9 @@ _color  bl @sget3                   ; get 3 parameters
         swpb r1                     ; move to ms byte
         bl @_vsbw0                  ; write to vdp
 gexit1  b @retB0
-;]
 
-;[ SCREEN ( colour -- )
+
+; SCREEN ( colour -- )
 ; sets the screen colour
 _scren  mov *stack+,r10             ; pop colour
         li r0,>0700                 ; vdp register number
@@ -359,9 +359,9 @@ _scren  mov *stack+,r10             ; pop colour
         soc r10,r0                  ; or colour into register
         bl @_vwtr
         jmp gexit1
-;]
 
-;[ SCROLL ( direction -- ) 
+
+; SCROLL ( direction -- ) 
 ; scrolls the screen, according to the coodinates in PANEL
 ; 0=left 2=right 4=up 6=down
 ; I'm not happy with these routines. I'm sure they could be shorter and faster
@@ -382,7 +382,7 @@ _scrol
         b *r0                       ; call the routine
 scrlut  data _left,_right,_up,_down ; addresses of the routines to call
 
-;[      ; left scroll...
+;      ; left scroll...
 _left   ; read a line from screen into buffer...
         mov r9,r0                   ; vdp address
         mov r6,r2                   ; number of bytes to read
@@ -411,9 +411,9 @@ _left1  movb *r1+,*r0+              ; copy character to the left
         jeq gexit1                  ; if so exit
         a r15,r9                    ; move down one line
         jmp _left                   ; repeat
-;]
 
-;[      ; right scroll...
+
+;      ; right scroll...
 _right  ; read a line from screen into buffer...
         mov r9,r0                   ; vdp address
         mov r6,r2                   ; number of bytes to read
@@ -445,9 +445,9 @@ _right1 movb *r1,*r0                ; copy character to the left
         jeq gexit1                  ; if so exit
         a r15,r9                    ; move down one line
         jmp _right                  ; repeat
-;]
 
-;[      ; up scroll...
+
+;      ; up scroll...
 _up     mov r10,r10                 ; check wrap
         jeq _up0                    ; jump if no wrap
         mov r9,r0                   ; top left address
@@ -478,9 +478,9 @@ _up3    li r1,>2000                 ; write a blank line
         bl @_vsbwm2                 ; write it
 _upout  clr @tib                    ; clear tib
 gexit2  b @retB0
-;]
 
-;[      ; down scroll...
+
+;      ; down scroll...
 _down   dec r7
         mov r7,r0                   ; y length
         mpy r15,r0                  ; convert to address (result in r1)
@@ -515,10 +515,10 @@ _down2  li r1,>2000                 ; write a blank line
         bl @_vsbwm2                 ; write it
 _dnout  clr @tib                    ; clear tib
         jmp gexit2
-;]
-;]
 
-;[ PANEL ( x y xl yl -- )
+
+
+; PANEL ( x y xl yl -- )
 ; defines a screen panel to be used by SCROLL
 _panel          
         bl @sget4                   ; get 4 parameters off stack
@@ -529,9 +529,9 @@ _panel
         mov r7,@panr                ; save yl
         mov r8,@panc                ; save xl
         jmp gexit2
-;]
 
-;[
+
+;
 ; subroutine to get parameters off the stack
 sget5   mov *stack+,r6
 sget4   mov *stack+,r7
@@ -539,9 +539,9 @@ sget3   mov *stack+,r8
         mov *stack+,r9
         mov *stack+,r10
         .rt
-;]
 
-;[
+
+;
 ; subroutine to get parameters off the stack for HCHAR VCHAR and GCHAR
 ; Has two entry points:
 ; get4: gets four parameters (HCHAR & VHCAR)
@@ -557,4 +557,4 @@ get2    mov *stack+,r0              ; pop x
         .rt
 gabort  ai stack,6                  ; pop remaining parameters off the stack
         b @retB0                    ; and just exit
-;]
+

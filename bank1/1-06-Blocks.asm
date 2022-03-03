@@ -8,16 +8,16 @@
 ; Some heavy stuff in here. In here be demons.
 ; Turn back all ye faint of heart...
 
-;[ pab opcodes
+; pab opcodes
 open    equ 0                       ; open opcode
 close   equ >1                      ; close opcode
 read    equ >2                      ; read opcode
 write   equ >3                      ; write opcode
 fwdrew  equ >4                      ; restore/rewind opcode (fwd/rew)
 status  equ >9                      ; status op-code
-;]
 
-;[ USE ( addr len -- )
+
+; USE ( addr len -- )
 ; Tells the system which block file to use for block IO
 ; e.g. USE DSK1.BLOCKS
 ; Simply sets the filename and length in the blockIO PAB
@@ -41,9 +41,9 @@ _use3   movb *r0+,*r9+              ; copy byte of filename to pab
         clr @blk4
         clr @blk5
 usexit  b @retB0
-;]
 
-;[ BLOCK ( block# -- addr )
+
+; BLOCK ( block# -- addr )
 ; Brings a block into a buffer, if not already in memory
 ;  1) If already in memory, the block is not re-loaded from device
 ;  2) If not in memory:
@@ -116,9 +116,9 @@ blkerr  clr *stack                  ; zero the TOS
         bl @rstsp                   ; restore code in scratchpad 
                                     ; (destroyed by DSR access)
         jmp usexit                  ; exit
-;]
 
-;[ FLUSH ( -- )
+
+; FLUSH ( -- )
 ; Flushes all dirty blocks back to disk
 ; If a blocks' DIRTY flag is set, the block is physically written back to disk.
 ; If the block is NOT dirty, it's (BLK) status is simply set to un-used.
@@ -177,9 +177,9 @@ flerr   swpb r0                     ; move error into low byte
         bl @diskio                  ; set the file to closed
         byte close,1
         jmp flexit
-;]
 
-;[ UPDATE ( -- )
+
+; UPDATE ( -- )
 ; marks the last accessed block as dirty so that it will subsequently be flushed
 ; to disk.
 _updat  mov @lstblk,r0              ; get current block
@@ -189,9 +189,9 @@ _updat  mov @lstblk,r0              ; get current block
         ori r0,>8000                ; set dirty bit
         mov r0,*r1                  ; write it back
         jmp flushx
-;]
 
-;[ EMPTY-BUFFERS ( -- )
+
+; EMPTY-BUFFERS ( -- )
 ; marks all buffers as unused.
 _mtbuf  li r2,6                     ; counter
         li r0,blk0                  ; address of first blk
@@ -204,26 +204,26 @@ mtbufl  clr *r0+                    ; zero block number then point to vdp
         jne mtbufl                  ; repeat if not finished
         clr @lstblk                 ; no blocks in memory
         jmp flushx
-;]
 
-;[ CLEAN ( buffer -- )
+
+; CLEAN ( buffer -- )
 ; forces a buffers' status to clean
 _clean  bl @cba                     ; compute blk address
         andi r1,>7fff               ; reset dirty bit
         mov r1,*r0                  ; write it back
         jmp flushx
 
-;]
 
-;[ DIRTY ( buffer -- )
+
+; DIRTY ( buffer -- )
 ; forces a buffers' status to dirty
 _dirty  bl @cba                     ; compute blk address
         ori r1,>8000                ; set dirty bit
         mov r1,*r0                  ; write it back
         jmp flushx
-;]
 
-;[ DIRTY? ( buffer -- flag )
+
+; DIRTY? ( buffer -- flag )
 ; interrogates a buffers' status, returning true if the buffer is dirty, else
 ; returning false
 _qdirt  bl @cba                     ; compute blk address
@@ -235,9 +235,9 @@ _qdirt  bl @cba                     ; compute blk address
         b @retB0
 ndirt   clr *stack                  ; it's clean
         jmp flushx
-;]
 
-;[ BLK? ( buffer -- block vdp_address )
+
+; BLK? ( buffer -- block vdp_address )
 ; For a given buffer, returns the actual block stored in that buffer
 ; and the vdp address of that buffer
 _blkq   bl @cba                     ; compute blk address
@@ -248,9 +248,9 @@ _blkq   bl @cba                     ; compute blk address
         dect stack
         mov r1,*stack               ; place vdp address of buffer on stack
         jmp flushx
-;]
 
-;[ BUF? ( block -- buffer vdp_address )
+
+; BUF? ( block -- buffer vdp_address )
 ; For a given block, return the buffer number, and the vdp address of the buffer
 ; returns 0 0 if the block is not in memory
 _buf    mov *stack,r1               ; get block
@@ -271,9 +271,9 @@ fndbuf  mov r2,*stack               ; push buffer number
         inct r0                     ; point to vdp address
         mov *r0,*stack              ; push it to stack
 bufxit  b @retB0
-;]
 
-;[ SETBLK ( buffer block -- )
+
+; SETBLK ( buffer block -- )
 ; For a given buffer, changes the block that it is associated with. 
 ; Allows blocks to copied to other blocks, using FLUSH.
 _setbk  mov *stack+,r1              ; pop the block
@@ -285,9 +285,9 @@ _setbk  mov *stack+,r1              ; pop the block
                                     ; descriptor table
         mov r1,*r0                  ; change block entry
         jmp bufxit
-;]
 
-;[ MKBLK ( filename size_in_kilobytes -- )
+
+; MKBLK ( filename size_in_kilobytes -- )
 ; makes a block file on disk. Sets DSKERR with result code. >0=some error
 _mkblk  clr @errnum                 ; clear last disk error
         mov *stack+,r0              ; length of file name
@@ -344,9 +344,9 @@ mkclse  bl @diskio                  ; write the pab to vdp
 mkderr  swpb r0
         mov r0,@errnum              ; set disk io error number
         jmp mkclse                  ; close file (for what it's worth) and exit
-;]
 
-;[ compute block address routine
+
+; compute block address routine
 ; given buffer number on the stack, gives address of appropriate blk in r0
 ; and the associated vdp address in r1
 ; Used by CLEAN, DIRTY, and DIRTY?
@@ -357,9 +357,9 @@ cba     mov *stack+,r0              ; get blk number
         inct r0                     ; point to vdp address pointer
         mov *r0,r1                  ; get vdp address
         .rt                          ; return to caller
-;]
 
-;[ Free Buffer subroutine. Scans for a free buffer. 
+
+; Free Buffer subroutine. Scans for a free buffer. 
 ; Returns a free blk address in r0.
 ; r0=0 means there are no free buffers
 ; a buffer will treated as free if it's dirty flag is not set
@@ -372,9 +372,9 @@ nxtfb   mov *r0,r1                  ; check block assignment
         jne nxtfb                   ; check again if not
         clr r0                      ; there are no free buffers
 bfree   .rt
-;]
 
-;[ scan buffers to see if the block in question is already in memory
+
+; scan buffers to see if the block in question is already in memory
 ; expects block number in r0
 ; returns address of blk in r1, or 0 if the block is not in memory
 scnblk  li r1,blk0                  ; address of first buffer
@@ -386,9 +386,9 @@ scnnxt  c r0,*r1                    ; is this the block we're looking for?
         jne scnnxt                  ; repeat if not
         clr r1                      ; not in memory
 fndblk  .rt
-;]
 
-;[ put the pab into vdp ram with the appropriate opcode in byte 0 of pab
+
+; put the pab into vdp ram with the appropriate opcode in byte 0 of pab
 ; then call dos...
 diskio  mov *r11+,@pabopc           ; load opcode and file format into ram pab
         mov r11,r10                 ; save return address, as BL below will 
@@ -403,9 +403,9 @@ diskio  mov *r11+,@pabopc           ; load opcode and file format into ram pab
         blwp @dsrlnk                ; call dos
         data 8                      ; disk op parameter, level 3 command    
         b *r10
-;]
 
-;[ dsr link routine - Written by Paolo Bagnaresi
+
+; dsr link routine - Written by Paolo Bagnaresi
 dsrlnk  data dsrlws                 ; dsrlnk workspace
         data dlentr                 ; entry point
 
@@ -508,9 +508,9 @@ data8   data >8                     ; just to compare. 8 is the data that
 decmal  text '.'                    ; for finding end of device name
         even
 h20     data >2000
-;]
 
-;[ restore code to scratch-pad ram
+
+; restore code to scratch-pad ram
 ; accessing the disk via the disk DSR destroys some code in scratch pad
 ; restore the code in scratch pad before returning    
 rstsp   li r0,toram                 ; address of 1st source block
@@ -522,4 +522,4 @@ rstsp1  mov *r0+,*r1+               ; copy a cell
 rstsp3  ci r0,padend                ; hit end of first block of code?
         jne rstsp1                  ; loop if not
         .rt
-;]
+

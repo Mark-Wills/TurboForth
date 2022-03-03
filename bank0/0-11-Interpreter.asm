@@ -7,7 +7,7 @@
 ; The interpreter/compiler                             | |                           
 ;                                                      |_|                           
 
-;[ INTERPRET ( -- )
+; INTERPRET ( -- )
 inth    data exeh,9                 ; points to execute in Compilation.a99
         text 'INTERPRET '
 interp  data docol
@@ -111,18 +111,18 @@ badblk  data lit,doboot,fetch
 badbk1  data cr,toterm,blkmsg
         data ioerr1,hexdot
 noboot  data ab0rt
-;]
 
-;[ STK? ( -- )
+
+; STK? ( -- )
 ; checks stack for underflow, aborts if underflow, else does nothing
 stkufh  data inth,4
         text 'STK?'
 stkuf   data docol,depth,ltz,zbrnch,stkx
         data error,toterm,stktxt,cr,ab0rt
 stkx    data exit
-;]
 
-;[ FORGET       --                            M,83                 
+
+; FORGET       --                            M,83                 
 ; Used in the form:                     
 ;       FORGET <name>                 
 ; If <name> is found in the compilation vocabulary, delete <name> from the 
@@ -141,9 +141,9 @@ forg1   data ghere                              ; save HERE
         data here_,store                        ; restore here
         data exit
 notfnd  data drop,exit                          ; take no action if not found
-;]
 
-;[ ABORT"       flag --                       C,I,83  "abort-quote" 
+
+; ABORT"       flag --                       C,I,83  "abort-quote" 
 ;                       --   (compiling)              
 ; Used in the form:                     
 ;       flag ABORT" ccc"              
@@ -157,9 +157,9 @@ abttxt  text 'ABORT"'
 abort   data docol,string,compile,rot,compile,zbrnch,ghere,lit,4,add,comma
         data compile,abort_,compile,drop2,exit
 abort_  data docol,type,cr,ab0rt
-;]
 
-;[ ABORT                                      79                   
+
+; ABORT                                      79                   
 ; Clears the data stack and performs the function of QUIT. 
 ; No message is displayed.
 ab0rth  data aborth,5
@@ -177,11 +177,11 @@ ab0rt   data docol
 clsall  data $+2
         bl @bank1                   ; close all open files
         data _clall                 ; see 1-14-File-IO.a99
-;]
 
-;[ VTYPE ( vdp_addr len -- )
+
+; VTYPE ( vdp_addr len -- )
 ; types a string stored in vdp to the screen
 ; vtypeh  data ab0rth,5
 ;         text 'VTYPE '
 ; vtype   data docol,dup,nrot,pad,swap,fvmbr,pad,swap,type,exit
-;]
+

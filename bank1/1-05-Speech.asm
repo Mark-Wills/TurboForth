@@ -15,7 +15,7 @@ ssflag  byte >aa                    ; 'speech synth present' check code
 spkROM  byte >50                    ; 'speak from ROM' command code
         even
 
-;[ TALKING? ( -- flag )
+; TALKING? ( -- flag )
 ; returns 0 if speech synth is idle, else returns -1
 _spkng  dect stack                  ; make space on data stack
         mov @synyes,r0              ; synth fitted?
@@ -29,9 +29,9 @@ _spkng  dect stack                  ; make space on data stack
         jmp sayxit                  ; return via r15
 nspk    clr *stack                  ; not speaking
         jmp sayxit
-;]
 
-;[ SAY ( addr count -- )
+
+; SAY ( addr count -- )
 ; feeds count words to the speech synth, starting at addr. Used to speak words
 ; from the built in speech rom. The data fed to the synth should be the entry
 ; addresses of speech rom words, as found in the editor assembler manual.
@@ -42,9 +42,9 @@ _say    mov *stack+,@spcnt          ; pop speech buffer count
         li r0,romspk                ; else get address of rom-speak routine
         mov r0,@spcsvc              ; load into speech service routine pointer
 sayxit  b @retB0
-;]
 
-;[ STREAM ( addr count -- )
+
+; STREAM ( addr count -- )
 ; feeds addr bytes to the speech synth, starting at addr. Used to stream raw
 ; speech data to the speech synth.
 ; MODIFIED FOR V1.2.3: If the synth is already talking then a new STREAM
@@ -59,9 +59,9 @@ _strem  mov *stack+,r0              ; pop speech buffer count
                                     ; (defined in 1-01-ISR.a99)
         mov r0,@spcsvc              ; load into speech service routine pointer
         jmp sayxit
-;]
 
-;[ speech support routines    
+
+; speech support routines    
 ; routine to see if speech synth is fitted
 ; on exit sets r0: 0=not detected >ffff=detected
 isspch  clr @synyes                 ; assume no speech synth detected
@@ -100,9 +100,9 @@ loadlp  src r0,4                    ; start with least significant nybble
         li r1,>4000                 ; signal to speech synth that we finished...
         movb r1,@spchwt             ; ...sending the address.
         .rt                          ; return to caller
-;]
 
-;[ (DATA) - runtime code for DATA
+
+; (DATA) - runtime code for DATA
 _data   dect stack              ; make stack entry
         mov pc,*stack           ; current address to stack
         inct *stack             ; plus 2
@@ -112,4 +112,4 @@ _data   dect stack              ; make stack entry
         sla r1,1                ; compute byte offset past data
         a r1,pc                 ; adjust program counter
         b @retB0
-;]
+

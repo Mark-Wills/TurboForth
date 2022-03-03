@@ -16,7 +16,7 @@ init
         bl @_vwtr
 
 
-;[ initialise SAMS card if fitted
+; initialise SAMS card if fitted
         li r12,>1e00                ; sams CRU base
         sbo 0                       ; enable access to mapper registers
         sbz 1                       ; disable mapping while we set it up
@@ -35,29 +35,29 @@ sams    mov r1,*r0+                 ; write to the register
         jne sams                    ; loop if not
         sbo 1                       ; enable mapping
         sbz 0                       ; lock the mapper registers
-;]
 
-;[ clear variables area
+
+; clear variables area
 cva     li r0,>a000                 ; start address
         li r1,prgtop                ; end address
 clrlop  clr *r0+                    ; clear a word
         c r0,r1                     ; finished?
         jne clrlop                  ; repeat if not
-;]
+
 
         mov r3,@sumode              ; restore start up graphics mode
         mov @>83c0,@seed            ; initialise random number seed
 
-;[ set up boot file name (DSK1.BLOCKS)
+; set up boot file name (DSK1.BLOCKS)
         li r0,bootfn                ; address of boot filename
         li r1,pabnln                ; destination
         li r2,12                    ; 12 bytes to copy
 bootlp  movb *r0+,*r1+              ; copy a byte
         dec r2                      ; finished?
         jne bootlp                  ; repeat if not
-;]
 
-;[ initialise console stuff
+
+; initialise console stuff
         li r0,cursrd                ; address of cursor delay
         clr *r0+                    ; initialise cursor delay
         seto *r0+                   ; enable screen scrolling
@@ -72,9 +72,9 @@ bootlp  movb *r0+,*r1+              ; copy a byte
     ;    mov r0,@>83c2               ; see page 4 smart programmer
     ;                                ; oct 86-vol 2 issue 5
     ; note: this has now been moved into the intialisation list, below.
-;]
 
-;[ load character sets...
+
+; load character sets...
 chrset
     ; initialise control characters to something visible
     ; we do this by writing the TF logo to ALL 256 characters
@@ -130,22 +130,22 @@ invlop  mov r13,r0                  ; get source address in r0 for VDP ops
 
         bl @csrdef                  ; define cursor and edge characters
                                     ; (see 1-11-Editor.a99)
-;]
 
-;[ Copy PAD routines into PAD RAM
+
+; Copy PAD routines into PAD RAM
 cpypad  bl @rstsp                   ; use the restore routine in 1-06-Blocks.a99
-;]
 
-;[ general initialisation - initialised from an address/data list
+
+; general initialisation - initialised from an address/data list
         li r0,adrlst                ; pointer to address/data table
         li r2,41                    ; number of items to load
 nxtdat  mov *r0+,r1                 ; get address to load
         mov *r0+,*r1                ; load the address with data
         dec r2                      ; finished?
         jne nxtdat                  ; loop if not
-;]
 
-;[ set up data and return stacks...
+
+; set up data and return stacks...
         li stack,dstack             ; data stack pointer
         li rstack,retstk            ; return stack pointer
 
@@ -153,9 +153,9 @@ nxtdat  mov *r0+,r1                 ; get address to load
 
         li r12,afteri               ; force return point in bank 0
         b @retB0                    ; return to caller in bank 0
-;]
 
-;[ initialisation data
+
+; initialisation data
 adrlst
         data base, 10             ; default number base
         data keydev, 50           ; default keyboard scan code
@@ -263,9 +263,9 @@ zerochr byte >38,>4c,>54,>54,>54,>64,>38,>00
 ochar   byte >38,>44,>44,>44,>44,>44,>38,>00
         byte 0 ; end of list
         even
-;]
 
-;[ GPLLNK
+
+; GPLLNK
 ; This routine is based on the routine published in the July 1986 edition of
 ; Smart Programmer. Modified by yours truly to allow it be executed from ROM.
 gplws   equ >83e0                   ; GPL workspace
@@ -309,9 +309,9 @@ xmlrtn  mov @getstk,r4              ; get GETSTK pointer
         bl *r4                      ; restore GROM address off the stack
         lwpi glnkws                 ; load our ws
         rtwp                        ; all done - return to caller
-;]
 
-;[ Check boot device routine
+
+; Check boot device routine
 ; this routine is called from 0-01-Startup.a99 to modify the disk boot device
 ; from DSK1 to DSKx where x is the ascii character of the key held down during
 ; cartridge boot-up
@@ -326,9 +326,9 @@ cboot1  ci r0,-1                    ; nothing pressed?
         sla r0,8                    ; otherwise move key code move to high byte
         movb r0,@pabfil+3           ; place the digit in cpu PAB
 cbootx  b @retB0
-;]
 
-;[
+
+;
 ; ***************************************************
 ; The following routines are copied to PAD on startup
 ; ***************************************************
@@ -469,4 +469,4 @@ zbq     inct pc                     ; otherwise move past address
         b *next
 padend                              ; end of secod source block
                                     ; end of copy to PAD section
-;]
+

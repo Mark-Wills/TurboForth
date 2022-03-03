@@ -8,7 +8,7 @@
 ;                        |_|                |___/                                  
 ; Compilation words...
 
-;[ HEADER ( address length -- )
+; HEADER ( address length -- )
 ; creates a dictionary entry starting at HERE, and links it to the previous 
 ; dictionary entry.
 _headr  mov *stack+,r1              ; length in r1
@@ -35,9 +35,9 @@ crtlp   movb *r0+,*r2+              ; get a character
         mov r2,@patch               ; update most recent CFA locaation
         mov r2,r0                   ; copy to r0 for memory pointer adjust rtn.
         jmp mpadj                   ; update memory free pointers and exit
-;]
 
-;[ , (COMMA) ( value -- )
+
+; , (COMMA) ( value -- )
 ; appends 16 bit word on TOS to the user memory addressed by HERE and updates
 ; HERE to point to next word
 _comma  mov @here,r0                ; get next free address in r0
@@ -50,9 +50,9 @@ mpadj   ci r0,>a000                 ; are we in high memory?
         jmp commax
 lomadj  mov r0,@ffailm              ; update high memory pointer
 commax  b @retB0
-;]
 
-;[ C, (COMMA) ( value -- )
+
+; C, (COMMA) ( value -- )
 ; appends an 8 bit value, from the least significant byte of TOS to HERE.
 ; Here is incremented by ONE BYTE, not one WORD.
 ; For safety, use ALIGN to align HERE to a word boundary afterwards.
@@ -63,9 +63,9 @@ _comab  mov @here,r0                ; get next free address in r0
                                     ; one byte
         mov r0,@here                ; update HERE
         jmp mpadj                   ; update memory pointers
-;]
 
-;[ ALIGN ( -- )
+
+; ALIGN ( -- )
 ; Aligns HERE to an even word boundary by rounding up if required
 ; Call it after using C!
 _align  mov @here,r0                ; get HERE
@@ -73,9 +73,9 @@ _align  mov @here,r0                ; get HERE
         andi r0,>fffe               ; round up if required
         mov r0,@here                ; store it
         jmp mpadj                   ; update memory pointers
-;]
 
-;[ HIDDEN ( dictionary_address -- )
+
+; HIDDEN ( dictionary_address -- )
 ; toggles the hidden attribute on the dictionary entry
 ; normally you would hide a word after defining it with: LATEST @ HIDDEN
 _hide   mov *stack+,r0              ; pop address of dictionary entry to r0
@@ -84,9 +84,9 @@ _hide   mov *stack+,r0              ; pop address of dictionary entry to r0
         xor @_bit1,r1               ; toggle hidden bit (weight >4000)
         mov r1,*r0                  ; store it
         jmp commax
-;]
 
-;[ IMMEDIATE ( -- )
+
+; IMMEDIATE ( -- )
 ; toggles the immediate bit in the dictionary entry pointed to by LATEST.
 _imm    mov @latest,r0              ; get address of latest dictionary entry
         inct r0                     ; point to length entry
@@ -94,16 +94,16 @@ _imm    mov @latest,r0              ; get address of latest dictionary entry
         xor @_bit0,r1               ; toggle immediate bit (weight >8000)
         mov r1,*r0                  ; store it
         jmp commax
-;]
 
-;[ ALLOT ( n -- )
+
+; ALLOT ( n -- )
 ; reserves n BYTES of memory, staring from HERE
 _allot  a *stack+,@here             ; pop and add n to HERE
         mov @here,r0                ; get HERE in r0 for mpadj routine
         jmp mpadj                   ; adjust memory pointers
-;]
 
-;[ COMPILE ( -- )
+
+; COMPILE ( -- )
 ; Used in colon definitiona. Compiles the next word into the current definition
 ; the word is not executed. E.g. COMPILE DROP compiles DROP to HERE. DROP is not
 ; actually executed
@@ -112,4 +112,4 @@ _compil mov @here,r0                ; get HERE
         mov r1,*r0+                 ; compile next word to HERE & increase HERE
         mov r0,@here                ; save HERE
         jmp mpadj                   ; adjust memory pointers
-;]
+

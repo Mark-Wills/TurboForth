@@ -6,7 +6,7 @@
 ;  \_____|\___/|_| |_|___/\___/|_|\___|     \/  \/  \___/|_|  \__,_|___/
 ;  Console IO words
 
-;[ PAGE ( -- ) see 0-09-Console.a99
+; PAGE ( -- ) see 0-09-Console.a99
 _cls    mov @xmax,r1                ; calculate the character count
         li r0,24                    ; according to the...
         mpy r0,r1                   ; ...text mode
@@ -16,9 +16,9 @@ _cls    mov @xmax,r1                ; calculate the character count
         clr @scrX                   ; zero x coordinate
         clr @scrY                   ; zero y coordinate
         b @retB0
-;]
 
-;[ JOYST ( joystick# -- value )
+
+; JOYST ( joystick# -- value )
 ; Scans the joystick returning the direction value
 _joyst  mov *stack,r1               ; get unit number
         ai r1,6                     ; use keyboard select 6 for #0, 7 for #1
@@ -37,6 +37,4 @@ _joyst  mov *stack,r1               ; get unit number
         limi 2                      ; briefly enable interrupts
         limi 0                      ; and turn 'em off again
         b @retb0                    ; return to caller in bank 0
-;]
-
 

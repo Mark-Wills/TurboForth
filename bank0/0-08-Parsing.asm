@@ -8,7 +8,7 @@
 ;                               |___/                                  
 ; Dictionary lookup and associated parsing words
 
-;[ EXPECT       addr +n --                    M,83                 
+; EXPECT       addr +n --                    M,83                 
 ; Receive characters and store each into memory.  The transfer begins at addr 
 ; proceeding towards higher addresses one byte per character until either a 
 ; "return" is received or until +n characters have been transferred.  
@@ -32,7 +32,7 @@ expnxt  bl @kscn                    ; scan keyboard (wait for a keypress)
     ; check for enter key...
         c *stack,@datCR             ; compare to carriage return (enter key)
         jeq exp2                    ; exit routine if enter was pressed 
-;[    ; check for backspace key...
+;    ; check for backspace key...
         c *stack,@lit8+4            ; compare to backspace key
         jne skipbs                  ; skip if backspace not pressed
         inct stack                  ; remove backspace from stack
@@ -56,7 +56,7 @@ back2   dec r14                     ; decrement buffer index pointer
         jmp expnxt                  ; get another keypress
 bumpY   inc @scrY                   ; prevent Y from going <0
         jmp back2
-;]
+
     ; process keypress...
 skipbs  dect stack                  ; new stack entry
         mov @2(stack),*stack        ; duplicate value on stack for EMIT
@@ -81,9 +81,9 @@ exp2    inct stack                  ; pop ascii 13 off the stack
 zchars  clr @_span
         b *next
 datCR   data 13                     ; ascii code for carriage return
-;]
 
-;[ Comments: ( \ & .(
+
+; Comments: ( \ & .(
 ; Allows comments e.g. : 1TO3 ( comment) 1 2 3 ;
 ; Reads through the TIB until ) is found or end of line
 remh    data expcth,immed+1
@@ -101,9 +101,9 @@ trcom   data $+2
 typcmh  data trcomh,immed+2
         text '.('
         data docol,lit,41,word,type,cr,exit
-;]
 
-;[ WORD ( delimiter -- address length )
+
+; WORD ( delimiter -- address length )
 ; Moves through TIB in VDP memory, discarding leading delimiters, looking for 
 ; a word. A word is identified when a trailing delimiter is detected. 
 ; The word is copied from VDP to CPU memory.
@@ -128,17 +128,17 @@ word2   data word1
 word1   data $+2
         bl @bank1
         data _word                  ; see 1-08-Parsing.a99
-;]
 
-;[ BL ( -- 32 )
+
+; BL ( -- 32 )
 ; pushes 32 decimal to the stack. BL is short for 'BLANK' often used in with 
 ; word to specify the delimeter: e.g. BL WORD
 blh     data wordh,2
         text 'BL'
 bl_     data docol,lit,32,exit  
-;]
 
-;[ FIND         addr1 len -- addr2 n              83                   
+
+; FIND         addr1 len -- addr2 n              83                   
 ; addr1 is the address of a string.  The string contains a word name to be 
 ; located in the currently active search order.  If the word is not found, addr2
 ; is the string address addr1, and n is zero.  
@@ -209,9 +209,9 @@ caschk  movb @cassen,r13            ; case sensitive mode switched off?
         ab r13,r1                   ; subtract -32 from the upper byte.
         ; char is now upper case
 casout  .rt
-;]
 
-;[ NUMBER ( address length -- number flag )
+
+; NUMBER ( address length -- number flag )
 ; Attempts to convert the string at address into a number. If fully successful,
 ; the number is placed on the stack and flag will be 0. If it fails (for example
 ; contains an illegal character) then a partial number will be placed on the 
@@ -240,9 +240,9 @@ number  data docol,lit,numvec,fetch,execut,exit ; fetch NUMBER vector & execute
 numbr1  data $+2
         bl @bank1
         data _numbr                 ; see 1-08-Parsing.a99
-;]
 
-;[ EVALUATE ( i*x c-addr u -- j*x)
+
+; EVALUATE ( i*x c-addr u -- j*x)
 ; evaluates the string specified by c-addr u 
 ; the interpretation state is stored before evaluation and restored afterwards
 ; should not be directly called within a block (or when BLK>0)
@@ -268,9 +268,9 @@ eval    data docol
         data rspop,blk,store
         data rspop,in_,store
         data exit
-;]
 
-;[ >CFA ( dictionary_address -- code_field_address)
+
+; >CFA ( dictionary_address -- code_field_address)
 ; Given a dictionary address returns the code-field address (CFA) of the word
 cfah    data evalh,4
         text '>CFA'
@@ -286,17 +286,17 @@ _cfa    mov *stack,r2               ; dictionary address
                                     ; to add 4 to a register in only 2 bytes!
         mov r1,*stack               ; move to stack
         b *next                     ; NEXT
-;]
 
-;[ >BODY ( cfa -- body_address )
+
+; >BODY ( cfa -- body_address )
 ; Given a CFA, returns the address of the body (the address of the "payload")
 ; of words created with CREATE. E.g. VARIABLE, VALUE, CONSTANT
 tbodyh  data cfah,5
         text '>BODY '
 tobody  data _plus2                 ; execute 2+ (see 0-03-Math.a99)
-;]
 
-;[ >LINK ( cfa -- link_field_address )
+
+; >LINK ( cfa -- link_field_address )
 ; given a code field address, returns the address of the beginning of the dictionary
 ; entry (the address of the link field).
 dfah    data tbodyh
@@ -322,4 +322,4 @@ dfa1    mov r0,r1                   ; copy it
         jmp dfa1                    ; otherwise check the next entry in the list
 dfafnd  mov r0,*stack               ; place on stack
         b *next
-;]
+

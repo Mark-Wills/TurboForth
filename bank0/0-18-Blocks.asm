@@ -23,7 +23,7 @@
 ;  The VDP addresses of the block buffers are defined in 1-15-Initialise.a99
 ;
 
-;[ USE ( addr len -- )
+; USE ( addr len -- )
 ; Tells the system which block file to use for block IO
 ; e.g. S" DSK1.BLOCKS" USE
 ; Simply sets the filename and length in the blockIO PAB
@@ -33,9 +33,9 @@ use     data docol,mtbuf,use1,exit
 use1    data $+2
         bl @bank1
         data _use               ; see 1-06-Blocks.a99
-;]
 
-;[ WHERE ( -- block# )
+
+; WHERE ( -- block# )
 ; returns the block number of word that has been loaded into memory with LOAD
 ; eg: WHERE FOO 
 ; can only be used from the command line
@@ -45,9 +45,9 @@ whereh  data useh,immed+5
 where   data docol,spword,find,zbrnch,where1
         data dfa,plus2,fetch,lit,4,rsft,lit,>3ff,and,plus1,exit
 where1  data drop,lit0,exit
-;]
 
-;[ BLK          -- addr                       U,79          "b-l-k" 
+
+; BLK          -- addr                       U,79          "b-l-k" 
 ; The address of a variable containing the number of the mass storage block 
 ; being interpreted as the input stream.  
 ; If the value of BLK is zero the input stream is taken from the text input 
@@ -58,18 +58,18 @@ blkh    data whereh,3
 blk     data $+2
         li r6,blknum            ; address of block variable in ram
         b @dovar                ; push it
-;]
 
-;[ --> ( -- )
+
+; --> ( -- )
 ; loads the next block
 nblkh   data blkh,immed+3
         text '--> '
 nblk    data docol
         data blk,fetch,plus1,blk,store,in_,store0
         data exit
-;]      
+      
 
-;[ THRU ( start end -- )
+; THRU ( start end -- )
 ; loads blocks start thru end inclusive by calling LOAD for each block.
 thruh   data nblkh,4
         text 'THRU'
@@ -79,9 +79,9 @@ thrulp  data    geti,load
         data loop,thrulp
 xthru   data exit
 ; : THRU ( start-block end-block -- ) 1+ SWAP DO I LOAD LOOP ;
-;]
 
-;[ BLOCK        u -- vdpaddr                  M,83                 
+
+; BLOCK        u -- vdpaddr                  M,83                 
 ; addr is the address of the assigned buffer of the first byte of block u.
 ; If the block occupying that buffer is not block u and has been UPDATEed it is
 ; transferred to mass storage before assigning the buffer.  
@@ -110,9 +110,9 @@ block   data docol,lit,blkvec,fetch,execut,exit
 block2  data $+2
         bl @bank1
         data _block             ; see 1-06-Blocks.a99
-;]
 
-;[ LIST ( block# -- )
+
+; LIST ( block# -- )
 ; lists a blocks' contents to the screen without loading it
 listh   data blockh,4
         text 'LIST'
@@ -125,9 +125,9 @@ list1   data cr,geti,lit,2,dotr
         data loop,list1
 lstxit  data drop,cr,blk,store0
         data lit,lstblk,store0,exit
-;]
 
-;[ LOAD ( block# -- )
+
+; LOAD ( block# -- )
 ; interprets a block
 loadh   data listh,4
         text 'LOAD'
@@ -143,13 +143,13 @@ load    data docol
         data rspop,blk,store
         data rspop,in_,store
         data exit
-;]
+
 
 fblock  ; ( blk# --)
         ; fetch block and strip off dirty bit
         data docol,block,lit,>7fff,and,exit 
 
-;[ CLOAD ( blk -- )
+; CLOAD ( blk -- )
 ; Conditionally loads a block if the referenced word (passed in the TIB) is 
 ; not found.
 ; e.g. 69 CLOAD SAMS? will load block 69 if the word SAMS? is not found.
@@ -160,9 +160,9 @@ cload   data docol,spword,find,nip
         data zbrnch,cload1
         data drop,exit
 cload1  data load,exit
-;]
 
-;[ UPDATE       --                            79                   
+
+; UPDATE       --                            79                   
 ; The currently valid block buffer is marked as modified. 
 ; Blocks marked as modified will subsequently be automatically transferred to 
 ; mass storage should its memory buffer be needed for storage of a different 
@@ -172,9 +172,9 @@ updath  data cloadh,6
 update  data $+2
         bl @bank1
         data _updat             ; see 1-06-Blocks.a99
-;]
 
-;[ FLUSH        --                            M,83                 
+
+; FLUSH        --                            M,83                 
 ; Flushes all modified buffers to the storage device then unassigns all block 
 ; buffers.
 flushh  data updath,5
@@ -182,9 +182,9 @@ flushh  data updath,5
 flush   data $+2
         bl @bank1
         data _flush             ; see 1-06-Blocks.a99
-;]
 
-;[ EMPTY-BUFFERS ( -- )
+
+; EMPTY-BUFFERS ( -- )
 ; immediately sets all buffers to unsaasigned.
 ; DOES NOT flush dirty buffers to disk
 mtbufh  data flushh,13
@@ -192,27 +192,27 @@ mtbufh  data flushh,13
 mtbuf   data $+2
         bl @bank1
         data _mtbuf             ; see 1-06-Blocks.a99
-;]
 
-;[ CLEAN ( buffer -- )
+
+; CLEAN ( buffer -- )
 ; forces a buffers' status to clean
 cleanh  data mtbufh,5
         text 'CLEAN '
 bclean  data $+2
         bl @bank1
         data _clean             ; see 1-06-Blocks.a99
-;]
+
         
-;[ DIRTY ( buffer -- )
+; DIRTY ( buffer -- )
 ; forces a buffers' status to dirty
 dirtyh  data cleanh,5
         text 'DIRTY '
 dirty   data $+2
         bl @bank1
         data _dirty             ; see 1-06-Blocks.a99
-;]
 
-;[ DIRTY? ( buffer -- flag )
+
+; DIRTY? ( buffer -- flag )
 ; interrogates a buffers' status, returning true if the buffer is dirty, else
 ; returning false
 dirtih  data dirtyh,6
@@ -220,9 +220,9 @@ dirtih  data dirtyh,6
 dirtyq  data $+2
         bl @bank1
         data _qdirt             ; see 1-06-Blocks.a99
-;]
 
-;[ BLK? ( buffer -- block vdp_address )
+
+; BLK? ( buffer -- block vdp_address )
 ; For a given buffer, returns the actual block stored in that buffer
 ; and the vdp address of that buffer
 blkqh   data dirtih,4
@@ -230,9 +230,9 @@ blkqh   data dirtih,4
 blkq    data $+2
         bl @bank1
         data _blkq             ; see 1-06-Blocks.a99
-;]
 
-;[ BUF? ( block -- buffer vdp_address )
+
+; BUF? ( block -- buffer vdp_address )
 ; For a given block, return the buffer number, and the vdp address of the buffer
 ; returns 0 0 if the block is not in memory
 bufh    data blkqh,4
@@ -240,9 +240,9 @@ bufh    data blkqh,4
 buf     data $+2
         bl @bank1
         data _buf             ; see 1-06-Blocks.a99
-;]
 
-;[ SETBLK ( buffer block -- )
+
+; SETBLK ( buffer block -- )
 ; For a given buffer, changes the block that it is associated with. 
 ; Allows blocks to copied to other blocks, using FLUSH. 
 ; Blocks can also be copied to a different block file by changing the blocks 
@@ -252,9 +252,9 @@ setblh  data bufh,6
 setblk  data $+2
         bl @bank1
         data _setbk             ; see 1-06-Blocks.a99
-;]
 
-;[ MKBLK ( block_count -- )
+
+; MKBLK ( block_count -- )
 ; makes a block file on disk.
 ; E.G. 80 MKBLOCK DSK1.BLOCKS
 ; The above creates an 80K file on disk 1 called BLOCKS.
@@ -268,7 +268,7 @@ mkblk   data docol
 mkblkc  data $+2
         bl @bank1
         data _mkblk                     ; see 1-06-Blocks.a99
-;]
+
     
 ; WriteHeader ( vdp_addr -- vdp_addr+8)
 ; : WRITE-HEADER ( vdp_addr -- vdp_addr+8)

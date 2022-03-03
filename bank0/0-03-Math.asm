@@ -6,70 +6,70 @@
 ; |_|  |_|\__,_|\__|_| |_|     \/  \/  \___/|_|  \__,_|___/
 
 
-;[ 1+           w1 -- w2                      79         "one-plus" 
+; 1+           w1 -- w2                      79         "one-plus" 
 ; w2 is the result of adding one to w1 according to the operations of + 
 plus1h  data rspoph,2
         text '1+'
 plus1   data _plus1                 ; code is in high-speed ram.
                                     ; see 1-15-Initialise.a99
-;]
 
-;[ 1-           w1 -- w2                      79        "one-minus" 
+
+; 1-           w1 -- w2                      79        "one-minus" 
 ; w2 is the result of subtracting one from w1 according to the operation of -
 sub1h   data plus1h,2
         text '1-'
 sub1    data $+2
         dec *stack
         b *next
-;]
 
-;[ 2+           w1 -- w2                      79         "two-plus" 
+
+; 2+           w1 -- w2                      79         "two-plus" 
 ; w2 is the result of adding two to w1 according to the operation of +
 plus2h  data sub1h,2
         text '2+'
 plus2   data _plus2                 ; code is in high-speed ram.
                                     ; see 1-15-Initialise.a99
-;]
 
-;[ CELL+        w1 -- w2+2
+
+; CELL+        w1 -- w2+2
 ; adds two (the cell size) to top of stack
 cellph  data plus2h,5
         text 'CELL+ '
 cellp   data _plus2
-;]
 
-;[ CHAR+        w1 -- w2+2
+
+; CHAR+        w1 -- w2+2
 ; adds two (the cell size) to top of stack
 charph  data cellph,5
         text 'CHAR+ '
 charp   data _plus1
-;]
 
-;[ 2-           w1 -- w2                      79        "two-minus" 
+
+; 2-           w1 -- w2                      79        "two-minus" 
 ; w2 is the result of subtracting two from w1 according to the operation of -
 sub2h   data charph,2
         text '2-'
 sub2    data _sub2                  ; code is in high-speed ram.
                                     ; see 1-15-Initialise.a99
-;]
 
-;[ 2* ( x -- x<<1 )
+
+; 2* ( x -- x<<1 )
 ; shifts the value on the stack left by one bit.
 mul2h   data sub2h,2
         text '2*'
 mul2    data $+2
 mul3    a *stack,*stack             ; :-)
         b *next
-;]
 
-;[ CELLS ( x1 -- x1*2 )
+
+; CELLS ( x1 -- x1*2 )
 ; returns the memory size required to hold x1 cells 
 cellsh  data mul2h,5
         text 'CELLS '
 cells   data mul3                   ; use the word 2* to do our work for us
-;]
 
-;[ 2/           n1 -- n2                      83       "two-divide" 
+
+; 2/           n1 -- n2                      83       "two-divide" 
 ; n2 is the result of arithmetically shifting n1 right one bit.  
 ; The sign is included in the shift and remains unchanged.
 div2h   data cellsh,2
@@ -79,33 +79,33 @@ div2    data $+2
         sra r8,1                    ; shift right
         mov r8,*stack               ; store on stack
         b *next
-;]
 
-;[ +            w1 w2 -- w3                   79             "plus" 
+
+; +            w1 w2 -- w3                   79             "plus" 
 ; w3 is the arithmetic sum of w1 plus w2.
 addh    data div2h,1
         text '+ '
 add     data _add                   ; code is in high-speed ram.
                                     ; see 1-15-Initialise.a99
-;]
 
-;[ -            w1 w2 -- w3                   79            "minus" 
+
+; -            w1 w2 -- w3                   79            "minus" 
 ; w3 is the result of subtracting w2 from w1.
 subh    data addh,1
         text '- '
 sub     data _sub                   ; code is in high-speed ram.
                                     ; see 1-15-Initialise.a99
-;]
 
-;[ *            w1 w2 -- w3                   79            "times" 
+
+; *            w1 w2 -- w3                   79            "times" 
 ; w3 is the least-significant 16 bits of the arithmetic product of w1 times w2.
 mulh    data subh,1
         text '* '
 mul     data _mul                   ; code is in high-speed ram.
                                     ; see 1-15-Initialise.a99
-;]
 
-;[ */           n1 n2 n3 -- n4                83     "times-divide" 
+
+; */           n1 n2 n3 -- n4                83     "times-divide" 
 ; n1 is first multiplied by n2 producing an intermediate 32-bit result.
 ; n4 is the floor of the quotient of the intermediate 32-bit result divided by
 ; the divisor n3.
@@ -120,9 +120,9 @@ sslash  data mulh,2
         data nip                    ; discard remainder
         data exit
         b *next
-;]
 
-;[ UM*          u1 u2 -- ud                   83        "u-m-times"
+
+; UM*          u1 u2 -- ud                   83        "u-m-times"
 ; ud is the unsigned-double product of u1 times u2.  
 ; All values and arithmetic are unsigned.
 ; high word of ud to top of stack
@@ -135,9 +135,9 @@ umsh    data sslash,3
         mov r1,*stack               ; push high word
         mov r2,@2(stack)            ; push low word
         b *next
-;]
 
-;[ /MOD         n1 n2 -- n3 n4                83       "divide-mod" 
+
+; /MOD         n1 n2 -- n3 n4                83       "divide-mod" 
 ; n3 is the remainder and n4 the floor of the quotient of n1 divided by the 
 ; divisor n2.
 ; n3 has the same sign as n2 or is zero.
@@ -155,9 +155,9 @@ smod1   bl @sidiv                   ; do a signed division
         mov r1,*stack               ; push quotient
         mov r2,@2(stack)            ; push remainder
         b *next
-;]
 
-;[ */MOD        n1 n2 n3 -- n4 n5             83 "times-divide-mod" 
+
+; */MOD        n1 n2 n3 -- n4 n5             83 "times-divide-mod" 
 ; n1 is first multiplied by n2 producing an intermediate 32-bit result.
 ; n4 is the remainder and n5 is the floor of the quotient of the intermediate
 ; 32-bit result divided by the divisor n3.  A 32-bit intermediate product is
@@ -175,9 +175,9 @@ ssm     data $+2
         mov r1,*stack               ; push quotient
         mov r2,@2(stack)            ; push remainder
         b *next
-;]
 
-;[ UM/MOD       ud u1 -- u2 u3                83   "u-m-divide-mod" 
+
+; UM/MOD       ud u1 -- u2 u3                83   "u-m-divide-mod" 
 ; u2 is the remainder and u3 is the floor of the quotient after dividing ud by
 ; the divisor u1.  All values and arithmetic are unsigned.  An error condition
 ; results if the divisor is zero or if the quotient lies outside the range
@@ -191,18 +191,18 @@ usmod   data $+2
         mov r1,*stack               ; push quotient
         mov r2,@2(stack)            ; push remainder
         b *next
-;]
 
-;[ /            n1 n2 -- n3                   83           "divide" 
+
+; /            n1 n2 -- n3                   83           "divide" 
 ; n3 is the floor of the quotient of n1 divided by the divisor n2. 
 ; An error condition results if the divisor is zero or if the quotient falls 
 ; outside of the range {-32,768..32,767}.
 sdivh   data umodh,1
         text '/ '
 sdiv    data docol,smod,nip,exit
-;]
 
-;[ MOD          n1 n2 -- n3                   83                   
+
+; MOD          n1 n2 -- n3                   83                   
 ; n3 is the remainder after dividing n1 by the divisor n2.
 ; n3 has the same sign as n2 or is zero.
 ; An error condition results if the divisor is zero or if the quotient falls
@@ -210,18 +210,18 @@ sdiv    data docol,smod,nip,exit
 modh    data sdivh,3
         text 'MOD '
 mod     data docol,smod,drop,exit
-;]
 
-;[ NEGATE       n1 -- n2                      79                   
+
+; NEGATE       n1 -- n2                      79                   
 ; n2 is the two's complement of n1, i.e, the difference of zero less n1.
 negh    data modh,6
         text 'NEGATE'
 neg_    data $+2
 neg2    neg *stack                  ; negate the word on TOS
         b *next
-;]
 
-;[ ABS          n -- u                        79         "absolute" 
+
+; ABS          n -- u                        79         "absolute" 
 ; u is the absolute value of n.  If n is -32,768 then u is the same value.
 ; STATUS: TESTED OK 13 APR 2009
 absh    data negh,3
@@ -229,9 +229,9 @@ absh    data negh,3
 abs_    data $+2
         abs *stack                  ; compute abs of the word on TOS
         b *next
-;]
 
-;[ MIN          n1 n2 -- n3                   79              "min" 
+
+; MIN          n1 n2 -- n3                   79              "min" 
 ; n3 is the lesser of n1 and n2 according to the operation of < .
 minh    data absh,3
         text 'MIN '
@@ -241,9 +241,9 @@ min     data $+2
         b *next                     ; otherwise keep n1
 keepn2  mov @-2(stack),*stack       ; keep n2
         b *next
-;]
 
-;[ MAX          n1 n2 -- n3                   79              "max" 
+
+; MAX          n1 n2 -- n3                   79              "max" 
 ; n3 is the greater of n1 and n2 according to the operation of > .
 maxh    data minh,3
         text 'MAX '
@@ -251,12 +251,12 @@ max     data $+2
         c *stack+,*stack            ; compare n2 and n1 (and pop n2)
         jgt keepn2                  ; keep n2 if it's higher
         b *next                     ; otherwise keep n1
-;]
+
 
 
 ; Floored math subroutines:
 
-;[ Signed divide using Floored Integer Division
+; Signed divide using Floored Integer Division
 ; Divides a 32 bit value in r1 and r2 by a 16 bit value in r0
 ; Inputs:
 ;   r0=divisor
@@ -300,9 +300,9 @@ signdo  mov r14,r14                 ; check sign of divisor
         .rt                          ; otherwise we're done
 floor1  neg r2                      ; remainder takes sign of divisor
         .rt                         ; done
-;]
 
-;[ Signed Multiply
+
+; Signed Multiply
 ; multiplies two signed 16-bit values, n1 & n2, giving a signed 32-bit product
 ; Inputs:
 ;   r0=n1
@@ -324,4 +324,4 @@ simul   mov r0,r6                   ; copy n1
         jnc simul1                  ; skip if no carry
         inc r1                      ; add 1 to high word to compensate for carry
 simul1  .rt
-;]
+

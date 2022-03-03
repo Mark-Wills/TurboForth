@@ -8,23 +8,23 @@
 ;                          |___/                                  
 ; string related words
 
-;[ U.           u --                          M,79          "u-dot" 
+; U.           u --                          M,79          "u-dot" 
 ; u is displayed as an unsigned number in a free-field format.
 udoth   data rndh,2
         text 'U.'
 udot    data docol,usign,type,space1,exit
-;]
 
-;[ .            n --                          M,79            "dot" 
+
+; .            n --                          M,79            "dot" 
 ; The absolute value of n is displayed in a free field format with a leading 
 ; minus sign if n is negative.
 doth    data udoth,1
         text '. '
 dot     data docol,sign
 dot1    data type,space1,exit
-;]
 
-;[ U.R ( num width -- )
+
+; U.R ( num width -- )
 udotrh  data doth,3
         text 'U.R '
 udotr   data docol
@@ -32,9 +32,9 @@ udotr   data docol
         data usign          ; width addr len
         data setw           ; addr len
         data branch,dot1
-;]
 
-;[ .R ( num width --)
+
+; .R ( num width --)
 dotrh   data udotrh,2
         text '.R'
 dotr    data docol          
@@ -42,13 +42,13 @@ dotr    data docol
         data sign           ; width addr len
         data setw           ; addr len
         data branch,dot1
-;]
 
-;[ subroutines used by . U. .R and U.R
+
+; subroutines used by . U. .R and U.R
 setw    data docol,rot,swap,tuck,sub,spces,exit
-;]
 
-;[ $. ( num -- )
+
+; $. ( num -- )
 ; prints a number as an unsigned hex value
 hdoth   data dotrh,2
         text '$.'
@@ -58,9 +58,9 @@ hexdot  data docol
         data usign,type
         data space1
         data base_,store,exit
-;]
 
-;[ N>S ( num -- addr len )
+
+; N>S ( num -- addr len )
 ; Takes a number off the stack and converts it to a signed string equivalent, 
 ; with respect to the current number base.
 ; The variable UNSIGNED is checked, and if true, the strings generated shall be
@@ -83,17 +83,17 @@ sign    data $+2
 usign   data $+2
         seto @dosign
         jmp nts1
-;]
 
-;[ CHAR ( -- ascii )
+
+; CHAR ( -- ascii )
 ; puts the ASCII code of the first character of the following word on the stack
 ; For example CHAR A puts 65 on the stack.
 charh   data ntsh,immed+4
         text 'CHAR'
 char    data docol,spword,drop,chrftc,exit
-;]
 
-;[ ASCII ( ascii -- )
+
+; ASCII ( ascii -- )
 ; In interpretation state:
 ;    pushes the ascii value of the character immediately following
 ;    ASCII to the stack. 
@@ -105,9 +105,9 @@ asciih  data charh,immed+5
 ascii   data docol,char,state_,fetch,zbrnch,asciix
         data clc        ; compile lit , 
 asciix  data exit
-;]
 
-;[ COUNT        addr1 -- addr2 +n             79                   
+
+; COUNT        addr1 -- addr2 +n             79                   
 ; addr2 is addr1+1 and +n is the length of the counted string at addr1.
 ; The byte at addr1 contains the byte count +n. 
 ; Range of +n is {0.255}  See:  "string, counted"
@@ -116,9 +116,9 @@ counth  data asciih,5
 count   data $+2
         bl @bank1
         data _count                 ; see 1-10-Strings.a99
-;]
 
-;[ S" Compile time:( -- ) Immediate:( -- address length )
+
+; S" Compile time:( -- ) Immediate:( -- address length )
 ; When Compiling:
 ; compiles: (S")<length><string>
 ; e.g S" HELLO" compiles (S") 5 H E L L O
@@ -147,9 +147,9 @@ strh    data strngh,4
 str     data $+2
         bl @bank1
         data _str                   ; see 1-10-Strings.a99
-;]
 
-;[ -TRAILING    addr +n1 -- addr +n2          79    "dash-trailing" 
+
+; -TRAILING    addr +n1 -- addr +n2          79    "dash-trailing" 
 ; The character count +n1 of a text string beginning at addr is adjusted to 
 ; exclude trailing spaces.  
 ; If +n1 is zero, then +n2 is also zero.  
@@ -159,9 +159,9 @@ trailh  data strh,9
 trail   data $+2
         bl @bank1
         data _trail                 ; see 1-10-Strings.a99
-;]
 
-;[ ."           --                            C,I,83    "dot-quote" 
+
+; ."           --                            C,I,83    "dot-quote" 
 ;                 --   (compiling)              
 ; Used in the form:                     
 ;       ." ccc"                       

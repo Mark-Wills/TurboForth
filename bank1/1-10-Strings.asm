@@ -7,7 +7,7 @@
 ; string related words      __/ |                                 
 ;                          |___/ 
 
-;[ RND ( limit -- n)
+; RND ( limit -- n)
 ; pushes a pseudo random number between 0 and limit-1 (rnd MOD limit)
 ; For the full range (0-65535) use a limit of 0
 _rnd    mov @seed,r1
@@ -20,9 +20,9 @@ _rnd    mov @seed,r1
         div *stack,r1               ; divide R1 by # on stack
         mov r2,*stack               ; copy remainder, R2, to stack
 rndx    b @retb0
-;]
 
-;[ COUNT ( addr1 -- addr2 len )
+
+; COUNT ( addr1 -- addr2 len )
 ; addr2 is addr1+1 and len is the length of the counted string at addr1.
 ; The byte at addr1 contains the byte count len. Range of len is {0.255}
 _count  mov *stack,r0               ; get addr1
@@ -32,9 +32,9 @@ _count  mov *stack,r0               ; get addr1
 PAE     dect stack                  ; make space on stack
         mov r7,*stack               ; push length    
         jmp rndx
-;]
 
-;[ -TRAILING ( addr len -- addr len )
+
+; -TRAILING ( addr len -- addr len )
 ; modifies len such that trailing spaces are excluded from the string
 _trail  mov *stack,*stack           ; check length
         jeq trlout                  ; if 0 then exit
@@ -49,9 +49,9 @@ trail1  dec *stack                  ; reduce length
         jeq rndx                    ; if we get to 0 then exit
         dec r0                      ; else check next address
         jmp trail2
-;]
 
-;[ S" Compile time:( -- ) Immediate:( -- address length )
+
+; S" Compile time:( -- ) Immediate:( -- address length )
 ; When Compiling:
 ; compiles: (S")<length><string>
 ; e.g S" HELLO" compiles (S") 5 H E L L O
@@ -96,9 +96,9 @@ _stri2  movb *r1+,*r0+              ; copy string to definition
         andi r0,>fffe               ; mask off LSB
         mov r0,@here                ; store it
         jmp mpadj                   ; adjust memory pointers and exit via mpadj
-;]
 
-;[ (S") ( -- cpu_addr len )
+
+; (S") ( -- cpu_addr len )
 ; pushes the address and length of the string (compiled by S") onto the stack 
 ; On entry, PC is actually pointing at the length byte. The address of the
 ; string is actually the address of the length byte+1. The length is just the
@@ -114,9 +114,9 @@ _str    movb *pc+,r0                ; get length
         ai pc,1                     ; round up PC...
         andi pc,>fffe               ; ...to an even value
         b @retB0
-;]
 
-;[ NUMBER TO STRING ( num -- addr len )
+
+; NUMBER TO STRING ( num -- addr len )
 ; Takes a number off the stack and converts it to a signed string equivalent,
 ; with respect to the current number base. Number base may be between
 ; 2 and 36. The routine checks location DOSIGN, and if 0, the
@@ -210,4 +210,4 @@ testlz  mov r10,r10                 ; are we ignoring leading zero's?
         jmp dodig                   ; else do digit normally
     ; character lookup table for printing numbers between bases 2 to 36
 tlut    text '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-;]
+

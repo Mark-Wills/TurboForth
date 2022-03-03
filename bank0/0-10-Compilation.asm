@@ -8,7 +8,7 @@
 ;                        |_|                |___/                                  
 ; Compilation words...
 
-;[ HEADER ( TIB:string -- )
+; HEADER ( TIB:string -- )
 ; creates a word (from the input source) in the dictionary and links the
 ; dictionary
 ; *********************************************************************
@@ -27,9 +27,9 @@ header  data docol
 headr   data $+2
         bl @bank1
         data _headr         ; see 1-09-Compilation.a99
-;]
 
-;[ MARKER ( -- )
+
+; MARKER ( -- )
 ; creates a marker in the dictionary that, when executed, removes all words 
 ; following the marker from the dictionary, and resets the compilation address 
 ; to the first free address following the marker.
@@ -59,9 +59,9 @@ domark  data $+2
         mov *pc+,@latest
         mov *pc+,@here
         b *next
-;]
 
-;[ CREATE       --                            M,79                  
+
+; CREATE       --                            M,79                  
 ; A defining word executed in the form: 
 ;       CREATE <name>                 
 ; Creates a dictionary entry for <name>.  After <name> is created, the next 
@@ -82,18 +82,18 @@ create  data docol
 crtime  dect stack                   ; make room for PFA
         mov r6,*stack                ; place PFA on stack
         b *next
-;]
 
-;[ patches CFA of last created word with address of run-time code of parent.
+
+; patches CFA of last created word with address of run-time code of parent.
 ; address contained in PATCH. Used by DOES> 
 altcfa  data $+2
         mov   @patch,r0         ; CFA of most recent definition
         mov   pc,*r0            ; patch it with parent's code field
         mov   *rstack+,pc       ; in-line EXIT that "ends" the definition
         b     *next             ; into which altcfa is compiled
-;]
 
-;[ DODOES
+
+; DODOES
 ; dynamically compiles instructions (for run-time transition from child to 
 ; parent for DOES> words) into the parent DOES> word.
 dodoes  data docol              
@@ -106,9 +106,9 @@ dodoes  data docol
         data ghere,lit,4,add,comma
         data compile,>045C      ; compile "b *next" instruction
         data exit
-;]
 
-;[ DOES>        -- addr                       C,I,83         "does" 
+
+; DOES>        -- addr                       C,I,83         "does" 
 ;                 --   (compiling)              
 ; Defines the execution-time action of a word created by a high-level defining 
 ; word.  
@@ -126,9 +126,9 @@ dodoes  data docol
 doesh   data creath,immed+5
         text 'DOES> '
 does    data docol,align,compile,altcfa,dodoes,exit
-;]
 
-;[ CONSTANT     16b --                        M,83                 
+
+; CONSTANT     16b --                        M,83                 
 ; A defining word executed in the form: 
 ;       16b CONSTANT <name>           
 ; Creates a dictionary entry for <name> so that when <name> is later executed,
@@ -146,9 +146,9 @@ const   data docol
 docon   dect stack                      ; make space on the data stack
         mov *r6,*stack                  ; push payload to the stack
         b *next
-;]
 
-;[ VARIABLE     --                            M,79                 
+
+; VARIABLE     --                            M,79                 
 ; A defining word executed in the form: 
 ;       VARIABLE <name>               
 ; A dictionary entry for <name> is created and two bytes are ALLOTted in its 
@@ -159,9 +159,9 @@ docon   dect stack                      ; make space on the data stack
 varh    data consth,8
         text 'VARIABLE'
 var     data docol,create,lit0,comma,exit
-;]
 
-;[ VALUE ( n -- )
+
+; VALUE ( n -- )
 ; A "value" is actually a variable, but with more friendly syntax. VALUEs work
 ; in conjunction with TO and +TO. (Perversely, they are implemented internally
 ; using constants!)
@@ -183,9 +183,9 @@ valueh  data varh,5
         text 'VALUE '
 value   data docol,const,exit
         ; no coolness here, it's just a constant, the coolness is in TO & +TO
-;]
 
-;[ TO ( n -- )
+
+; TO ( n -- )
 ; Allows the value of an already created VALUE to be changed:
 ; 100 VALUE SETPOINT (create a SETPOINT value with the value of 100)
 ; 65 TO SETPOINT (change SETPOINTs value to 65)
@@ -208,9 +208,9 @@ doto    data $+2
         mov *pc+,r0         ; get in-line body address
         mov *stack+,*r0     ; move tos to values' body
         b *next
-;]
 
-;[ +TO ( n -- )
+
+; +TO ( n -- )
 ; Similar to TO above, but adds the value on the stack to the value.
 ; 100 VALUE SETPOINT (create a value called SETPOINT with the value 100)
 ; 25 +TO SETPOINT (changes SETPOINTs value to 125)
@@ -232,7 +232,7 @@ dopto   data $+2
         mov *pc+,r0         ; get in-line body address
         a *stack+,*r0       ; pop and add tos to value in the values' body
         b *next
-;]
+
 
 ; common routine to get body and state. Used by TO and +TO save a few bytes by
 ; making it common, and no run time penalty since this bit of code executes at
@@ -240,7 +240,7 @@ dopto   data $+2
 ; ( -- body state)
 ToUtil  data docol,getword,tobody,state_,fetch,exit
 
-;[ ALLOT        w --                          79            
+; ALLOT        w --                          79            
 ; Allocates w bytes in the dictionary.
 ; The address of the next available dictionary entry is updated accordingly.
 alloth  data ptoh,5
@@ -248,16 +248,16 @@ alloth  data ptoh,5
 allot   data $+2
         bl @bank1
         data _allot         ; see 1-09-Compilation.a99
-;]
 
-;[ LIT ( -- n )
+
+; LIT ( -- n )
 ; places the literal number on the datastack
 lith    data alloth,3
         text 'LIT '
 lit     data _lit           ; runs from 16-bit ram
-;]
 
-;[ LITERAL      -- 16b                        C,I,79               
+
+; LITERAL      -- 16b                        C,I,79               
 ; 16b --   (compiling)          
 ; Typically used in the form:           
 ;       [ 16b ] LITERAL               
@@ -268,18 +268,18 @@ literh  data lith,immed+7
 litral  data docol
         data clc                    ; compile lit and value from stack
         data exit
-;]
 
-;[ ,            16b --                        79            "comma" 
+
+; ,            16b --                        79            "comma" 
 ; ALLOT space for 16b then store 16b at HERE 2- .
 commah  data literh,1
         text ', '
 comma   data $+2
         bl @bank1
         data _comma         ; see 1-09-Compilation.a99
-;]
 
-;[ C, (COMMA) ( value -- )
+
+; C, (COMMA) ( value -- )
 ; appends an 8 bit value, from the least significant byte of TOS to HERE.
 ; Here is incremented by ONE BYTE, not one WORD.
 ; For safety, use ALIGN to align HERE to a word boundary afterwards.
@@ -288,9 +288,9 @@ ccommh  data commah,2
 ccomma  data $+2
         bl @bank1
         data _comab         ; see 1-09-Compilation.a99
-;]
 
-;[ ALIGN ( -- )
+
+; ALIGN ( -- )
 ; Aligns HERE to an even word boundary by rounding up if required
 ; Call it after using C!
 alignh  data ccommh,5
@@ -298,9 +298,9 @@ alignh  data ccommh,5
 align   data $+2
         bl @bank1
         data _align         ; see 1-09-Compilation.a99
-;]
 
-;[ [            --                            I,79   "left-bracket" 
+
+; [            --                            I,79   "left-bracket" 
 ;                 --   (compiling)              
 ; Sets interpret state.
 ; The text from the input stream is subsequently interpreted. 
@@ -310,9 +310,9 @@ lbrakh  data alignh,immed+1
 lbrack  data $+2
         clr @_state                 ; set state to 0
         b *next
-;]
 
-;[ ]            --                            79    "right-bracket" 
+
+; ]            --                            79    "right-bracket" 
 ; Sets compilation state.
 ; The text from the input stream is subsequently compiled. 
 ; For typical usage see LITERAL . See:  [
@@ -321,9 +321,9 @@ rbrakh  data lbrakh,1
 rbrack  data $+2
         seto @_state                ; set state to non zero
         b *next
-;]
 
-;[ :            -- sys                        M,79          "colon" 
+
+; :            -- sys                        M,79          "colon" 
 ; A defining word executed in the form: 
 ;       : <name> ... ;                
 ; Create a word definition for <name> in the compilation vocabulary and set 
@@ -358,9 +358,9 @@ colon   data docol
         data rbrack                 ; switch on compile mode 
         data exit
         
-;]
 
-;[ CODE: ( -- )
+
+; CODE: ( -- )
 ; Defines a machine code word. 
 codeh   data colonh,5
         text 'CODE: '
@@ -369,18 +369,18 @@ codeh   data colonh,5
         data ghere,plus2,comma
         data litm1,lit,coding,store
         data exit
-;]
 
-;[ ;CODE ( -- )
+
+; ;CODE ( -- )
 ; ends a machine code definition
 ecodeh  data codeh,immed+5
         text ';CODE '
 ecode   data docol
         data lit,>045c,comma,lit,coding,store0
         data exit
-;]
 
-;[ ;            --                            C,I,79   "semi-colon" 
+
+; ;            --                            C,I,79   "semi-colon" 
 ;           sys --   (compiling)          
 ; Stops compilation of a colon definition, allows the <name> of this colon 
 ; definition to be found in the dictionary, sets interpret state and compiles 
@@ -435,9 +435,9 @@ semi3   data lbrack                       ; go into interpret mode
 isserr  data docol,cr,error,toterm,intxt,colnam,unbal
         data plus1 ; set unbalanced error detect to non-zero value
         data exit
-;]    
+    
 
-;[ HIDDEN ( dictionary_address -- )
+; HIDDEN ( dictionary_address -- )
 ; toggles the hidden attribute on the dictionary entry
 ; normally you would hide a word after defining it with: LATEST @ HIDDEN
 hidh    data semih,6
@@ -445,9 +445,9 @@ hidh    data semih,6
 hideme  data $+2
         bl @bank1
         data _hide
-;]
 
-;[ IMMEDIATE    --                            79                   
+
+; IMMEDIATE    --                            79                   
 ; Marks the most recently created dictionary entry as a word which will be 
 ; executed when encountered during compilation rather than compiled.
 immh    data hidh,9
@@ -455,9 +455,9 @@ immh    data hidh,9
 imm     data $+2
         bl @bank1
         data _imm
-;]
 
-;[ [']          -- addr                       C,I,M,83    "bracket-tick"
+
+; [']          -- addr                       C,I,M,83    "bracket-tick"
 ;                 --   (compiling)
 ; Used in the form:                     
 ;       ['] <name>                    
@@ -469,9 +469,9 @@ tickh   data immh,immed+3
         text '[''] '
 tick    data docol,getword,litral,exit
 
-;]
 
-;[ '            -- addr                       M,83           "tick" 
+
+; '            -- addr                       M,83           "tick" 
 ; Used in the form:
 ;       ' <name>
 ; addr is the compilation address of <name>.  
@@ -480,9 +480,9 @@ tick    data docol,getword,litral,exit
 tick2h  data tickh,1
         text ''' '
 tick2   data docol,getword,exit
-;]
 
-;[ COMPILE      --                            C,83                 
+
+; COMPILE      --                            C,83                 
 ; Typically used in the form:           
 ;       : <name> ... COMPILE <namex> ... ;                 
 ; When <name> is executed, the compilation address compiled for <namex> is 
@@ -497,9 +497,9 @@ compile data $+2
         mov *pc+,r1                 ; get cfa of next word in thread
         bl @bank1                   ; do the rest in bank 1
         data _compil                ; see 1-09-Compilation.a99
-;]
 
-;[ [COMPILE]    --                            C,I,M,79    "bracket-compile"
+
+; [COMPILE]    --                            C,I,M,79    "bracket-compile"
 ;                 --   (compiling)
 ; Used in the form:                     
 ;       [COMPILE] <name>              
@@ -513,9 +513,9 @@ icomp   data docol
         data find,drop              ; find it in the dictionary
         data comma                  ; compile the CFA to HERE
         data exit
-;]
 
-;[ RECURSE ( -- )
+
+; RECURSE ( -- )
 ; RECURSE makes a recursive call to the current word that is being compiled.
 ; Normally while a word is being compiled, it is marked HIDDEN so that
 ; references to the same word within are calls to the previous definition of
@@ -529,9 +529,9 @@ recurs  data docol
         data cfa                    ; convert to CFA
         data comma                  ; compile it
         data exit
-;]
 
-;[ EXECUTE      addr --                       79                   
+
+; EXECUTE      addr --                       79                   
 ; The word definition indicated by addr is executed.  
 ; An error condition exists if addr is not a compilation address
 exeh    data recrsh,7
@@ -540,7 +540,7 @@ execut  data $+2
         mov *stack+,r6              ; pop addr to r6
         mov *r6+,r7                 ; get cfa
         b *r7                       ; execute it
-;]
+
 
 ; little utility word to get a word using a space as a delimiter.
 ; Saves a few bytes as it is used in multiple places.

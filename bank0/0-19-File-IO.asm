@@ -6,7 +6,7 @@
 ; |_|    |_|_|\___|  |_____/_/   \____/ 
 ; File IO implementation                                       
 
-;[ FILE ( s_addr  s_len  buf_addr -- )
+; FILE ( s_addr  s_len  buf_addr -- )
 ; Builds a PAB in the buffer whose address is passed as buf_addr using the data
 ; in the string represented by s_addr and s_len.
 ; For example:
@@ -54,9 +54,9 @@ fileh   data bloadh,4
 file1   data $+2
         bl @bank1
         data _file              ; see 1-14-File-IO.a99
-;]
 
-;[ FBUF: ( -- )
+
+; FBUF: ( -- )
 ; builds a buffer with the name given for use with File IO. 
 ; The buffer is used to hold the PAB during construction by FILE.
 ; e.g. FBUF: MYFILE
@@ -76,9 +76,9 @@ fbuf    data docol
         data create         ; create dictionary entry
         data lit,42,allot   ; reserve 42 bytes
         data exit
-;]
 
-;[ #OPEN ( buf_addr -- t|f )
+
+; #OPEN ( buf_addr -- t|f )
 ; Opens a file with the file name and attributes specified in the buffer
 ; starting at file_addr.
 ; The buffer (actually a PAB) is set-up with FILE.
@@ -105,9 +105,9 @@ fopenh  data fbufh,5
 fopen1  data $+2
         bl @bank1
         data _fopen              ; see 1-14-File-IO.a99
-;]
 
-;[ #CLOSE ( fid -- )
+
+; #CLOSE ( fid -- )
 ; closes a file
 ; Where a file is opened thus: MYFILE #OPEN
 ; the following will close the same file: MYFILE #CLOSE
@@ -116,9 +116,9 @@ fclosh  data fopenh,6
 fclose  data $+2
         bl @bank1
         data _fclos              ; see 1-14-File-IO.a99
-;]
 
-;[ #GET ( buff_addr fid -- t|f )
+
+; #GET ( buff_addr fid -- t|f )
 ; reads a line of input from the file specified by fid.
 ; The address of an appropriately sized buffer must be supplied. 
 ; If the read is successful, the buffer is filled with the data read from the
@@ -136,9 +136,9 @@ fgeth   data fclosh,4
 fget    data $+2
         bl @bank1
         data _fget              ; see 1-14-File-IO.a99
-;]
 
-;[ #PUT ( buff_addr len fid - t|f )
+
+; #PUT ( buff_addr len fid - t|f )
 ; Places a string from buffer_addr with length len to the file represented by 
 ; fid. 
 ; Returns false if successful, else returns true. 
@@ -148,18 +148,18 @@ fputh   data fgeth,4
 fput    data $+2
         bl @bank1
         data _fput              ; see 1-14-File-IO.a99
-;]
 
-;[ #REC ( record# fid -- )
+
+; #REC ( record# fid -- )
 ; Sets the record number for reading or writing for relative files
 frech   data fputh,4
         text '#REC'
 frec    data $+2
         bl @bank1
         data _frec              ; see 1-14-File-IO.a99
-;]
 
-;[ #5LOAD ( "filename" loadAddr -- )
+
+; #5LOAD ( "filename" loadAddr -- )
 load5h  data frech,6
         text 'LOAD#5'
 load5   data docol
@@ -167,9 +167,9 @@ load5   data docol
         data lit,>0500
         data opt5
         data exit 
-;]
 
-;[ #5SAVE ( "filename" size saveAddr -- )
+
+; #5SAVE ( "filename" size saveAddr -- )
 save5h  data load5h,6
         text 'SAVE#5'
         data docol
@@ -180,13 +180,13 @@ save5h  data load5h,6
 opt5    data $+2
         bl @bank1           ; addr len size loadAddr opcode
         data _opt5
-;]
+
         
-;[ #EOF? ( fid -- t|f )
+; #EOF? ( fid -- t|f )
 ; returns true if currently positioned at the end of the file referenced by fid
 feofh   data save5h,5
         text '#EOF? '
 feof    data $+2
         bl @bank1
         data _feof              ; see 1-14-File-IO.a99
-;]
+

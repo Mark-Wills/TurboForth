@@ -6,7 +6,7 @@
 ;  \_____|\___/|_| |_|___/\___/|_|\___|     \/  \/  \___/|_|  \__,_|___/
 ;  Console IO words
 
-;[ BREAK? ( -- )
+; BREAK? ( -- )
 ; scans keyboard and does an ABORT if break (FCTN 4) is pressed
 breakh  data dfah,6
         text 'BREAK?'
@@ -15,9 +15,9 @@ break   data docol,keyq,lit,2,eq,zbrnch,break1
 break1  data exit
 brkmsg  byte 5 ; length of text 
         text 'Break '
-;]
 
-;[ GOTOXY ( x y -- )
+
+; GOTOXY ( x y -- )
 ; sets the screen cursor to the specified (0 based) x y screen coordinates
 goxyh   data breakh,6
         text 'GOTOXY'
@@ -25,9 +25,9 @@ gotoxy  data $+2
         mov *stack+,@scry           ; pop y
         mov *stack+,@scrx           ; pop x
         b *next
-;]
 
-;[ TYPE         addr +n --                    M,79                 
+
+; TYPE         addr +n --                    M,79                 
 ; +n characters are displayed from memory beginning with the character at addr 
 ; and continuing through consecutive addresses.  
 ; Nothing is displayed if +n is zero.  
@@ -47,9 +47,9 @@ typlp   movb *r10+,r7               ; get byte from string in r7 MSB
         dec r13                     ; have we finished?
         jne typlp                   ; if not, repeat
 typout  b *next
-;]
 
-;[ WORDS ( -- )
+
+; WORDS ( -- )
 ; displays a list of all the words in the dictionary
 wordsh  data typeh,5
         text 'WORDS '
@@ -67,9 +67,9 @@ words2  data drop,cr,dot
         data exit
 wftxt   byte 6
         text 'Words '
-;]
 
-;[ XY? ( -- x y )
+
+; XY? ( -- x y )
 ; places the cursor x and y coordinates on the stack
 xyh     data wordsh,3
         text 'XY? '
@@ -79,9 +79,9 @@ xy      data $+2
         dect stack                  ; new stack entry
         mov @scrY,*stack            ; push scrY to stack
         b *next
-;]
 
-;[ SPACE        --                            M,79                 
+
+; SPACE        --                            M,79                 
 ; Displays an ASCII space.
 spaceh  data xyh,5
         text 'SPACE '
@@ -91,9 +91,9 @@ space1  data $+2
         mov r0,*stack               ; push it to stack
         bl @emit_                   ; call emit
         b *next
-;]
 
-;[ SPACES       +n --                         M,79                 
+
+; SPACES       +n --                         M,79                 
 ; Displays +n ASCII spaces.  Nothing is displayed if +n is zero.
 spcesh  data spaceh,6
         text 'SPACES'
@@ -109,27 +109,27 @@ spces1  dect stack                  ; create stack entry
         dec r7                      ; decrement count
         jne spces1                  ; repeat if not finished
 spcesx  b *next
-;]
 
-;[ PAGE ( -- )
+
+; PAGE ( -- )
 ; clears screen
 clsh    data spcesh,4
         text 'PAGE'
 cls     data $+2        
         bl @bank1
         data _cls                   ; see 1-02-Console.a99
-;]
 
-;[ JOYST ( joystick# -- value )
+
+; JOYST ( joystick# -- value )
 ; Scans the joystick returning the direction value
 joysth  data clsh,5
         text 'JOYST '
 joyst   data $+2
         bl @bank1                   ; see 1-02-Console.a99
         data _joyst
-;]
 
-;[ EMIT         16b --                        M,83                 
+
+; EMIT         16b --                        M,83                 
 ; The least-significant 8-bit ASCII character is displayed. SEE:  "9.5.3 EMIT"
 emith   data joysth,4
         text 'EMIT'
@@ -154,9 +154,9 @@ clipx   clr @scrX                   ; reset x to 0
         c @scrY,@ymax               ; have we hit the bottom of the screen?
         jeq scrlup                  ; if yes then scroll screen up
 emitx   b *r9                       ; else return
-;]
 
-;[ KEY          -- 16b                        M,83                 
+
+; KEY          -- 16b                        M,83                 
 ; The least-significant 7 bits of 16b is the next ASCII character received.  
 ; All valid ASCII characters can be received.
 ; Control characters are not processed by the system for any editing purpose.
@@ -220,9 +220,9 @@ csrwrt  bl @ccp                     ; call compute cursor position
         mov r7,r1                   ; move cursor character to r1 for VSBW
         bl @vsbw                    ; write the cursror character to the screen
         b *r6                       ; return to caller
-;]
 
-;[ KEY? ( -- ascii/-1 )
+
+; KEY? ( -- ascii/-1 )
 ; Scans keyboard and returns the ascii code of the key pressed, 
 ; or -1 if no key pressed
 keyqh   data kscnh,4
@@ -240,9 +240,9 @@ keyqsr  movb @keydev,@>8374         ; set keyboard to scan
         mov r7,*stack               ; place value on stack
         mov r12,@>83d6              ; defeat auto screen blanking
         .rt                         ; return to caller
-;]
 
-;[ CR           --                            M,79            "c-r" 
+
+; CR           --                            M,79            "c-r" 
 ; Displays a carriage-return and line-feed or equivalent operation.
 crh     data keyqh,2
         text 'CR'
@@ -253,7 +253,7 @@ cr      data $+2
         c @scry,@ymax               ; have we hit the bottom of the screen?
         jeq scrlup                  ; if yes, then scroll the screen
 crexit  b *next                     ; NEXT
-;]
+
 
 ; Scroll screen up by one line. Used by EMIT and CR to scroll the screen up if
 ; necessary (sub-routine, not a FORTH word).
@@ -304,11 +304,11 @@ ccp     mov @scry,r0                ; y coordinate of screen in r0
         a @scrX,r0                  ; add x coordinate
         .rt
 
-;[ BYE ( -- )
+; BYE ( -- )
 ; resets the console back to the title screen
 byeh    data crh,3
         text 'BYE '
 bye     data $+2
         clr @isr                    ; remove isr hook
         blwp @0                     ; cold reset console. So long, old pal.
-;]
+

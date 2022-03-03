@@ -8,7 +8,7 @@
 
 lastwd    ; this is the last word in the built-in dictionary
 
-;[ EDIT ( block# -- )
+; EDIT ( block# -- )
 ; loads 'block' and invokes the editor
 ; on exit from the editor, location TEMP is checked. If not 0, it loads
 ; the block number in TEMP. 
@@ -42,4 +42,4 @@ edit1   data cls,exit
 edit3   data $+2
         bl @bank1
         data _edit                  ; see 1-11-Editor.a99
-;]
+

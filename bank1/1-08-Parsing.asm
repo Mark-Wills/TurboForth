@@ -8,7 +8,7 @@
 ;                               |___/                                  
 ; Dictionary lookup and associated parsing words
 
-;[ WORD ( delimiter address -- address length )
+; WORD ( delimiter address -- address length )
 ;
 ; Moves through TIB in VDP memory, discarding leading delimiters, 
 ; looking for a word. A word is identified when a trailing delimiter is
@@ -64,9 +64,9 @@ vread   mov r11,r14                 ; save return address
 vread1  bl @_vsbr                   ; read from vdp
 vread2  inc r0                      ; advance input buffer address
         b *r14                      ; return to caller
-;]
 
-;[ code for processing \ type comments
+
+; code for processing \ type comments
 ; assembly equivalent of : \ >IN @ 64 + -64 AND >IN ! ; IMMEDIATE
 _trcom  mov @blknum,r0              ; loading a block?
         jeq trcom1                  ; jump if not
@@ -77,9 +77,9 @@ _trcom  mov @blknum,r0              ; loading a block?
         jmp wrdxit2                 ; exit (jump is smaller than a branch!)
 trcom1  mov @tibsiz,@in             ; set >IN to the end of the line
 comxit  jmp wrdxit2                 ; exit (jump is smaller than a branch!)
-;]
 
-;[ NUMBER ( address length -- (numberMSW) numberLSW error )
+
+; NUMBER ( address length -- (numberMSW) numberLSW error )
 ; Attempts to convert the string at cpu address address into a number. 
 ; If fully successful, the number is placed on the stack and flag will be 0. 
 ; If it fails (for example contains an illegal character) then a partial number
@@ -222,6 +222,6 @@ pusher  mov r0,*stack               ; push error flag
         li r12,_next                ; restore r12
         jmp comxit                  ; exit
                                     ; (a jump is 2 bytes shorter than a branch)
-;]
+
 
 _space  data >2000

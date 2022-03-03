@@ -45,7 +45,7 @@ isrout  b @isrxit                   ; return to Forth environment
 ; ------------------------------------------------------------------------------
 
 refill  equ 8                       ; # of bytes to refill the synth fifo with
-;[ 'stream-speak' routine to feed raw speech bytes to the speech synth
+; 'stream-speak' routine to feed raw speech bytes to the speech synth
 strspk    
     ; if speech synth is already busy then just exit, we'll start up proper
     ; when the synth is idle...
@@ -88,9 +88,9 @@ strxit  jmp isrnxt                  ; go check user isr
 strcu   clr @spcsvc                 ; clear speech service pointer - we're done
         clr @spcnt                  ; there's no bytes left to stream
         jmp isrnxt                  ; go check user isr
-;]
 
-;[ 'rom-speak' routine to feed rom addresses to the speech synth
+
+; 'rom-speak' routine to feed rom addresses to the speech synth
 romspk  ; check speech synth, exit if synth is busy...
         bl @spstat                  ; get status from speech synth into 
                                     ; scratch-pad ram
@@ -120,6 +120,6 @@ dly42   dec r0                      ; spin the wheels...
                                     ; service.
 romspx  b @isrxit                   ; return to next stage of isr handler 
                                     ; (in 1-15-initialise.a99)
-;]
+
 ; end of speech ISR
 ; -----------------------------------------------------------------------------

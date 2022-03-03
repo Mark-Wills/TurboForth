@@ -18,7 +18,7 @@ ahead   data docol
         data exit
 
 
-;[ FOR ( loop_count -- )
+; FOR ( loop_count -- )
 ; Implements FOR...NEXT looping as in COUNT FOR .. .. NEXT 
 ; I is available for retrieving the index. 
 ; : FOR ( start--) COMPILE LIT 0 , COMPILE SWAP [COMPILE] DO ; IMMEDIATE
@@ -28,19 +28,19 @@ for     data docol
         data compile,lit0
         data compile,swap,do1
         data exit
-;]
 
-;[ NEXT
+
+; NEXT
 ; : NEXT ( --) COMPILE LIT -1 , [COMPILE] +LOOP ; IMMEDIATE
 nexth   data forh,immed+4
         text 'NEXT'
 fnext1  data docol
         data litm1,clc,ploop1
         data exit
-;]
+
 
 ;   : IF ( -- addr )    POSTPONE ?BRANCH  MARK ;  IMMEDIATE
-;[ IF           flag --                       C,I,79               
+; IF           flag --                       C,I,79               
 ;                       -- sys   (compiling)
 ; Used in the form:                     
 ;        flag IF ... ELSE ... THEN     
@@ -57,10 +57,10 @@ if      data docol
         data lit,ifcnt,refup
         data compile,zbrnch,mark
         data exit
-;]               
+               
 
 ;   : THEN  HERE SWAP ! ;  IMMEDIATE
-;[ THEN         --                            C,I,79               
+; THEN         --                            C,I,79               
 ;             sys --   (compiling)
 ; Used in the form:                     
 ;       flag IF ... ELSE ... THEN     
@@ -74,10 +74,10 @@ then    data docol
         data lit,ifcnt,refdn
         data ghere,swap,store
         data exit
-;]
+
 
 ;   : ELSE  POSTPONE AHEAD  SWAP  POSTPONE THEN ;  IMMEDIATE
-;[ ELSE         --                            C,I,79               
+; ELSE         --                            C,I,79               
 ;            sys1 -- sys2   (compiling)    
 ; Used in the form:                     
 ;       flag IF ... ELSE ... THEN     
@@ -89,9 +89,9 @@ elseh   data thenh,immed+4
 else    data docol
         data ahead,swap,ghere,swap,store
         data exit
-;]
 
-;[ BRANCH ( -- )
+
+; BRANCH ( -- )
 ; unconditional branch: e.g: BRANCH 4 will branch forwards four words.
 ; Negative offsets supported.
 brnchh  data elseh,6
@@ -101,18 +101,18 @@ branch  data $+2
         mov *pc,pc              ; get the in-line address and move to the
         b *next                 ; instruction pointer
         
-;]
+
         
-;[ 0BRANCH ( flag -- )
+; 0BRANCH ( flag -- )
 ; Branch if data on the stack is 0. e.g: 0BRANCH 4 will branch forwards 4
 ; bytes if the value on the data stack is 0
 zbrchh  data brnchh,7
         text '0BRANCH '
 zbrnch  data _zbrnch            ; code is in high-speed ram.
                                 ; see 1-15-Initialise.a99
-;]
 
-;[ CASE..OF..ENDCASE ( -- )
+
+; CASE..OF..ENDCASE ( -- )
 ; Part of CASE..OF..ENDCASE
 ; CASE
 caseh   data zbrchh,immed+4
@@ -144,10 +144,10 @@ endcas  data docol
         data lit,cascnt,refdn   ; reference count
         data compile,drop,qdup,zbrnch,$+8,then,branch,$-10
         data exit
-;]
+
 
 ;   : BEGIN  HERE ; IMMEDIATE \ synonym purely for readability
-;[ BEGIN        --                            C,I,79               
+; BEGIN        --                            C,I,79               
 ;                 -- sys   (compiling)          
 ; Used in the form:                     
 ;       BEGIN ... flag UNTIL          
@@ -164,30 +164,30 @@ begin   data docol
         data lit,begcnt,refup
         data ghere
         data exit
-;]
+
 
 ;   : UNTIL  POSTPONE ?BRANCH , ;  IMMEDIATE
-;[ UNTIL ( address -- )
+; UNTIL ( address -- )
 untilh  data beginh,immed+5
         text 'UNTIL '
 until   data docol
         data lit,begcnt,refdn
         data compile,zbrnch,comma
         data exit
-;]
+
 
 ;   : AGAIN  POSTPONE BRANCH , ; IMMEDIATE
-;[ AGAIN ( address -- )
+; AGAIN ( address -- )
 againh  data untilh,immed+5
         text 'AGAIN '
 again   data docol
         data lit,begcnt,refdn
         data compile,branch,comma
         data exit
-;]
+
 
 ;   : WHILE  POSTPONE IF  SWAP ; IMMEDIATE
-;[ WHILE        flag --                       C,I,79               
+; WHILE        flag --                       C,I,79               
 ;                  sys1 -- sys2   (compiling)    
 ; Used in the form:                     
 ;       BEGIN ... flag WHILE ... REPEAT                    
@@ -203,10 +203,10 @@ whileh  data againh,immed+5
 while   data docol
         data if,swap
         data exit
-;]
+
 
 ;   : REPEAT  POSTPONE AGAIN  POSTPONE THEN ; IMMEDIATE
-;[ REPEAT       --                            C,I,79               
+; REPEAT       --                            C,I,79               
 ;             sys --   (compiling)          
 ; Used in the form:                     
 ;       BEGIN ... flag WHILE ... REPEAT                    
@@ -218,9 +218,9 @@ repeth  data whileh,immed+6
 repeat  data docol
         data again,then
         data exit
-;]
 
-;[ DO           w1 w2 --                      C,I,83               
+
+; DO           w1 w2 --                      C,I,83               
 ;                        -- sys   (compiling)          
 ; Used in the form:                     
 ;       DO ... LOOP                   
@@ -277,9 +277,9 @@ do      data $+2
         dect rstack             ; new return stack entry
         mov r0,*rstack          ; loop index to return stack
         b *next
-;]
 
-;[ LOOP         --                            C,I,83               
+
+; LOOP         --                            C,I,83               
 ;             sys --   (compiling)          
 ; Increments the DO-LOOP index by one.  If the new index was incremented across
 ; the boundary between limit-1 and limit the loop is terminated and loop control
@@ -305,9 +305,9 @@ loopx   ai rstack,6             ; otherwise pop loop frame
         b *next
 lagain  mov *pc,pc              ; reload loop address
         b *next
-;]
 
-;[ +LOOP        n --                          C,I,83    "plus-loop" 
+
+; +LOOP        n --                          C,I,83    "plus-loop" 
 ;               sys --   (compiling)          
 ; n is added to the loop index.  If the new index was incremented across the
 ; boundary between limit-1 and limit then the loop is terminated and loop 
@@ -326,9 +326,9 @@ plooph  data plooh1,7
 ploop   data $+2
         a *stack+,*rstack       ; pop increment and add to index on return stack
         jmp loopchk
-;]
 
-;[ LEAVE        --                            C,I,83               
+
+; LEAVE        --                            C,I,83               
 ;                 --   (compiling)              
 ; Transfers execution to just beyond the next LOOP or +LOOP .
 ; The loop is terminated and loop control parameters are discarded.  
@@ -345,9 +345,9 @@ leave   data $+2
         mov @4(rstack),pc       ; load pc with exit address
         ai rstack,6             ; pop loop frame from return stack
         b *next
-;]
 
-;[ I            -- w                          C,79                 
+
+; I            -- w                          C,79                 
 ; w is a copy of the loop index.  May only be used in the
 ; form:   
 ;       DO ... I ... LOOP             
@@ -360,9 +360,9 @@ geti    data $+2
         mov @2(rstack),*stack   ; place index on data stack        
         a *rstack,*stack        ; adjust
         b *next
-;]
 
-;[ J            -- w                          C,79                 
+
+; J            -- w                          C,79                 
 ; w is a copy of the index of the next outer loop.
 ; May only be used within a nested DO-LOOP or DO-+LOOP in the form, for example:                              
 ; DO ... DO ... J ... LOOP ... +LOOP
@@ -374,9 +374,9 @@ getj    data $+2
         mov @8(rstack),*stack   ; place outer loop index on data stack
         a @6(rstack),*stack     ; adjust
         b *next
-;]
 
-;[ utility routines for reference counting
+
+; utility routines for reference counting
 refup   data $+2
         mov *stack+,r0          ; pop address of reference counter
         inc *r0                 ; increase reference counter
@@ -386,4 +386,4 @@ refdn   data $+2
         mov *stack+,r0          ; pop address of reference of counter
         dec *r0                 ; decrease reference counter
         b *next
-;]
+

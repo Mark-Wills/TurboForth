@@ -6,10 +6,10 @@
 ;        |_____/ \___/ \__,_|_| |_|\__,_|     \/  \/ \___/|_|  \__,_|___/
                                                                         
 
-;[ SOUND ( pitch vol ch# -- )
+; SOUND ( pitch vol ch# -- )
 soundh  data feofh,5
         text 'SOUND '
 sound   data $+2
         bl @bank1
         data sound1     ; see 1-15-Sound.a99
-;]
+

@@ -6,7 +6,7 @@
 ; |_|    |_|_|\___|  |_____/_/   \____/ 
 ; File IO implementation                                       
 
-;[ FILE ( s-addr  s-len  buf-addr -- )
+; FILE ( s-addr  s-len  buf-addr -- )
 ; Builds a PAB in the buffer whose address is passed as buf_addr using the data
 ; in the string represented by s_addr and s_len.
 ; For example:
@@ -131,9 +131,9 @@ bitmsk  byte >00,>10                ; F & V bits
         byte >00,>02,>04,>06        ; U O I & A bits
         byte >00,>01                ; S & R bits
 foopts  text 'FVDLUOIASR'           ; file options (L=internaL)
-;]
 
-;[ #OPEN ( file_addr -- t|f )
+
+; #OPEN ( file_addr -- t|f )
 ; Opens a file with the file name and attributes specified in the buffer 
 ; starting at file_addr.
 ; The buffer (actually a PAB) is set-up with FILE.
@@ -200,9 +200,9 @@ _foerr  srl r0,8                    ; move error code to lower byte
         mov r0,@errnum              ; set disk io error number
         seto *stack                 ; set true flag (failure)
         jmp fexit
-;]
 
-;[ #CLOSE ( fid -- )
+
+; #CLOSE ( fid -- )
 ; closes a file
 ; Where a file is opened thus: S" DSK1.README DV80IS" #OPEN MYFILE
 ; the following will close the same file: MYFILE #CLOSE
@@ -223,9 +223,9 @@ _fcxit  jmp fexit
 _fcfnd  mov r13,*r1                 ; move address (with msb reset) back into 
                                     ; file allocation table
         jmp _fcxit
-;]
 
-;[ #GET ( buff_addr fid -- t|f )
+
+; #GET ( buff_addr fid -- t|f )
 ; reads a line of input from the file specified by fid. 
 ; The address of an appropriately sized buffer must be supplied. 
 ; If the read is successful, the buffer is filled with the data read from the
@@ -263,7 +263,7 @@ _fgerr  srl r0,8                    ; move error code to lower byte
         mov r0,@errnum              ; set disk io error number
         seto *stack                 ; set stack to true (failed)
         ; fall down into fexit...
-;]
+
 
 
 
@@ -273,7 +273,7 @@ fexit   bl @rstsp                   ; restore code in scratchpad
 
 
 
-;[ #PUT ( buff_addr len  fid - t|f )
+; #PUT ( buff_addr len  fid - t|f )
 ; Places a string from buffer_addr with length len to the file represented by 
 ; fid. 
 ; Returns false if successful, else returns true. 
@@ -319,9 +319,9 @@ _fpvdp  mov *stack,r0               ; vdp address of pab in r0
         swpb r1                     ; get lsb
         bl @_vsbw0                  ; write it
         jmp _fp2
-;]
 
-;[ #REC ( record# fid -- )
+
+; #REC ( record# fid -- )
 ; Sets the record number for reading or writing for relative files
 _frec   mov *stack+,r0              ; get fid
         mov *r0,r0                  ; get vdp address of associated pab
@@ -332,10 +332,10 @@ _frec   mov *stack+,r0              ; get fid
         movb *stack+,r1             ; get low byte of record number
         bl @_vsbw0                  ; write it
         b @retB0
-;]
 
 
-;[ #EOF? ( fid -- t|f )
+
+; #EOF? ( fid -- t|f )
 ; returns true if currently positioned at the end of the file referenced by fid
 _feof   bl @dodcmd
         data status*256
@@ -351,9 +351,9 @@ _feof   bl @dodcmd
         dect stack                  ; make space on stack (dodcmd pops the fid)
         mov r1,*stack               ; move to stack
         jmp fexit
-;]
 
-;[
+
+;
 _opt5   ; addr len size loadAddr opcode
         ; build a PAB in CPU ram
         mov @here,r0                ; get here
@@ -382,12 +382,12 @@ _opt5   ; addr len size loadAddr opcode
         data 8                      ; standard file access 
         bl @rstsp                   ; restore scratchpad
         b @retB0                    ; see ya 
-;]
+
         
         
         
 
-;[ Do Disk Command subroutine - executes the disk command passed by the caller
+; Do Disk Command subroutine - executes the disk command passed by the caller
 dodcmd  mov *r11+,r1                ; get opcode
         mov r11,r14                 ; save return address
         mov *stack+,r0              ; get pointer to cpu ram pab
@@ -406,7 +406,7 @@ docmd1  bl @_vsbw                   ; write the op-code to the pab
         blwp @dsrlnk
         data 8
         b *r14                      ; return to caller
-;]
+
 
 ; close all open files
 ; called by abort in bank 0

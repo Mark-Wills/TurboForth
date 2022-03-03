@@ -6,7 +6,7 @@
 ; |_|  |_|\___|_| |_| |_|\___/|_|   \__, | /_/    \_\___|\___|\___|___/___/
 ; Memory access words                __/ |                                 
 ;                                   |___/                                  
-;[ FILL ( addr count value -- )
+; FILL ( addr count value -- )
 _fill   bl @sget3                   ; get 3 parameters
         mov r9,r9                   ; if value=0 then...
         jeq cmvext                  ; ...just exit
@@ -15,9 +15,9 @@ filllp  movb r8,*r10+               ; move to addr and increment addr
         dec r9                      ; finished?
         jne filllp                  ; repeat if not
         jmp cmvext                  ; clean up and exit
-;]
 
-;[ CMOVE ( addr1 addr2 count -- )
+
+; CMOVE ( addr1 addr2 count -- )
 ; Move count bytes beginning at address addr1 to addr2. The byte at addr1 is 
 ; moved first, proceeding toward high memory. If count is zero nothing is moved
 _cmove  bl @sget3                   ; get 3 parameters
@@ -27,9 +27,9 @@ cmovlp  movb *r10+,*r9+             ; move a byte
         dec r8                      ; finished?
         jne cmovlp                  ; repeat if not
         jmp cmvext                  ; clean up and exit
-;]
 
-;[ CMOVE> ( addr1 addr2 count -- )
+
+; CMOVE> ( addr1 addr2 count -- )
 ; Move the count bytes at address addr1 to addr2. The move begins by moving the
 ; byte at addr1 plus count minus 1 to addr2 plus count minus 1 and proceeds to
 ; successively lower addresses for count bytes.
@@ -48,9 +48,9 @@ cmvflp  movb *r10,*r9               ; move a byte
         dec r8                      ; decrement count
         jne cmvflp                  ; loop if not finished
 cmvext  b @retB0
-;]
 
-;[ COPYW (source destination count -- )
+
+; COPYW (source destination count -- )
 ; copy WORDS from source to destination for 'count' words
 ; no action taken if count=0
 _copyw  bl @sget3
@@ -60,9 +60,9 @@ copywl  mov *r10+,*r9+              ; copy a word
         dec r8                      ; decrement counter
         jne copywl                  ; loop if counter not zero
         jmp cmvext                  ; clean up and exit
-;]
 
-;[ ; >MAP ( bank address -- )
+
+; ; >MAP ( bank address -- )
 ; If a SAMS card is present, maps memory bank "bank" to address "address"
 _sams   mov r12,r11                 ; save address of NEXT
         mov *stack+,r1              ; get address
@@ -81,9 +81,8 @@ _sams   mov r12,r11                 ; save address of NEXT
         mov r11,r12                 ; restore address of NEXT
         b @retB0                    ; return to caller
 
-;]
 
-;[ VDP Write To Register ( value register -- )
+; VDP Write To Register ( value register -- )
 _vwtrf  mov *stack+,r0              ; get register
         sla r0,8                    ; move to high byte
         mov *stack+,r1              ; get value
@@ -91,4 +90,4 @@ _vwtrf  mov *stack+,r0              ; get register
         soc r1,r0                   ; merge
         bl @_vwtr                   ; write it
         b @retB0
-;]
+

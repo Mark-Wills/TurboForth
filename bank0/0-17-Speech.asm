@@ -10,16 +10,16 @@
 ; these routines are just dictionary entry stubs.
 ; see 1-04-Speech.a99 for the actual implementation.
 
-;[ TALKING? ( -- flag )
+; TALKING? ( -- flag )
 ; returns >0 if the speech synth is busy, else returns 0
 spkngh  data panelh,8
         text 'TALKING?'
 spkng   data $+2
         bl @bank1
         data _spkng             ; see 1-05-Speech.a99
-;]
 
-;[ SAY ( addr cnt -- )
+
+; SAY ( addr cnt -- )
 ; says words from the speech synth's ROM. Use with DATA
 ; the addresses of the built in words are in ED/AS manual page 422
 sayh    data spkngh,3
@@ -27,18 +27,18 @@ sayh    data spkngh,3
 say     data $+2
         bl @bank1
         data _say             ; see 1-05-Speech.a99
-;]
 
-;[ STREAM ( addr cnt -- )
+
+; STREAM ( addr cnt -- )
 ; streams raw speech data to the speech synth. Use with DATA
 strmh   data sayh,6
         text 'STREAM'
 strm    data $+2
         bl @bank1
         data _strem             ; see 1-05-Speech.a99
-;]
 
-;[ DATA
+
+; DATA
 ; Compiling: DATA ( -- )  Executing: DATA ( -- addr count )
 ; E.g.
 ; When compiling:
@@ -67,4 +67,4 @@ rtdath  data datah,6
 rtdata  data $+2
         bl @bank1               
         data _data              ; see 1-05-Speech.a99
-;]
+

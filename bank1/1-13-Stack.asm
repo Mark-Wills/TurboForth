@@ -6,7 +6,7 @@
 ; |_____/ \__|\__,_|\___|_|\_\     \/  \/  \___/|_|  \__,_|___/
 ; Core words pertaining to data and return stack manipulation
 
-;[ PICK ( x1 x2 x3 x4 n -- x1 x2 x3 x4 x5 )
+; PICK ( x1 x2 x3 x4 n -- x1 x2 x3 x4 x5 )
 ; picks the nth value from the data stack and places a copy of it on the top 
 ; of the data stack.
 ; note: parameters start from 0. 0 PICK is equivalent to DUP.
@@ -17,9 +17,9 @@ _pick   mov *stack,r6               ; get required stack parameter number
         a stack,r6                  ; add stack address to offset
         mov *r6,*stack              ; read that address and place on stack
 pickx   b @retB0                    ; NEXT
-;]
 
-;[ ROLL ( +n -- n )
+
+; ROLL ( +n -- n )
 ; The +nth stack value, not counting +n itself is first removed and then 
 ; transferred to the top of the stack, moving the remaining values into the
 ; vacated position.  {0..the number of elements on the stack-1}
@@ -43,9 +43,9 @@ rolllp  mov *r10,*r1                ; move source back one word
         jne rolllp                  ; loop if not
         mov r0,*stack               ; place earlier saved value to TOS
 exroll  jmp pickx                   ; NEXT
-;]
 
-;[ DEPTH ( -- depth )
+
+; DEPTH ( -- depth )
 ; depth is the number of 16-bit values contained in the data stack before depth
 ; was placed on the stack.
 _depth  mov stack,r7                ; copy address of TOS
@@ -56,4 +56,4 @@ _depth  mov stack,r7                ; copy address of TOS
         dect stack                  ; new stack entry
         mov r6,*stack               ; push depth
         jmp pickx                   ; NEXT
-;]
+
