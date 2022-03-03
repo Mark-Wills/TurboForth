@@ -15,7 +15,7 @@ _rnd    mov @seed,r1
         mpy r0,r1                   ; mpultiply r1 by r0
         ai r2,>7ab9                 ; add 7ab9 to r2
         src r2,5                    ; rotate r2 5 bits right
-        mov r2,@seed
+        mov r2,@seed                ; update seed for next call
         clr r1                      ; msw of dividend
         div *stack,r1               ; divide R1 by # on stack
         mov r2,*stack               ; copy remainder, R2, to stack
